@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Tree — Curriculum Map</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0e17;
+  --card: #111827;
+  --card-hover: #1a2234;
+  --border: #1e293b;
+  --green-dim: #064e3b;
+  --green: #10b981;
+  --green-bright: #34d399;
+  --cyan: #06b6d4;
+  --cyan-dim: #0e4f5c;
+  --amber: #f59e0b;
+  --amber-dim: #713f12;
+  --violet: #8b5cf6;
+  --violet-dim: #3b1f7a;
+  --rose: #f43f5e;
+  --rose-dim: #6b1a2a;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+  --trunk: #365314;
+}
+
+body { background: var(--bg); font-family: 'Outfit', sans-serif; color: var(--text); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useCallback, useRef, useEffect } = React;
+
+const STYLE = `
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #0a0e17;
+  --card: #111827;
+  --card-hover: #1a2234;
+  --border: #1e293b;
+  --green-dim: #064e3b;
+  --green: #10b981;
+  --green-bright: #34d399;
+  --cyan: #06b6d4;
+  --cyan-dim: #0e4f5c;
+  --amber: #f59e0b;
+  --amber-dim: #713f12;
+  --violet: #8b5cf6;
+  --violet-dim: #3b1f7a;
+  --rose: #f43f5e;
+  --rose-dim: #6b1a2a;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-dim: #475569;
+  --trunk: #365314;
+}
+
+body { background: var(--bg); font-family: 'Outfit', sans-serif; color: var(--text); }
+`;
+
+/* ─── DATA: Moduły i ścieżki ─── */
+
+const LEVELS = {
+  EXPLORER: { id: "explorer", label: "Explorer", age: "9-10", color: "green", icon: "🌱" },
+  BUILDER: { id: "builder", label: "Builder", age: "11-12", color: "cyan", icon: "🔧" },
+  CREATOR: { id: "creator", label: "Creator", age: "13-14", color: "amber", icon: "⚡" },
+  DEVELOPER: { id: "developer", label: "Developer", age: "15-17", color: "violet", icon: "🚀" },
+};
+
+const MODULES = [
+  // ── EXPLORER (9-10) ──
+  {
+    id: "CT1",
+    level: "explorer",
+    title: "Myślenie komputacyjne",
+    subtitle: "Fundament",
+    duration: "~12 tygodni",
+    frequency: "1x/tyg, 60 min",
+    prereq: null,
+    unlocks: ["S1"],
+    summary: "Uczniowie poznają cztery filary myślenia komputacyjnego bez komputera i z komputerem.",
+    skills: ["Dekompozycja problemów", "Rozpoznawanie wzorców", "Abstrakcja", "Algorytmiczne myślenie", "Pseudokod i schematy blokowe"],
+    tools: ["Ćwiczenia unplugged", "Code.org", "Blockly Games"],
+    project: "Zaprojektuj grę planszową z jasnymi regułami algorytmicznymi",
+    outcomes: ["Rozkłada problem na mniejsze części", "Tworzy prosty schemat blokowy", "Rozumie pojęcie pętli, warunku i sekwencji"],
+  },
+  {
+    id: "S1",
+    level: "explorer",
+    title: "Scratch — Podstawy",
+    subtitle: "Pierwsze programy",
+    duration: "~14 tygodni",
+    frequency: "1x/tyg, 60 min",
+    prereq: "CT1",
+    unlocks: ["S2"],
+    summary: "Programowanie wizualne w Scratch — od animacji do prostych gier.",
+    skills: ["Zdarzenia i duszki", "Pętle (powtarzaj, zawsze)", "Warunki (jeżeli/to/w przeciwnym razie)", "Zmienne i wynik gry", "Komunikaty między duszkami"],
+    tools: ["Scratch 3.0", "Scratch Wiki"],
+    project: "Gra 'Złap obiekty' z punktacją, poziomami trudności i ekranem końcowym",
+    outcomes: ["Tworzy interaktywne animacje", "Używa zmiennych do śledzenia stanu", "Rozumie sekwencję zdarzeń w programie"],
+  },
+  {
+    id: "S2",
+    level: "explorer",
+    title: "Scratch — Zaawansowany",
+    subtitle: "Złożone projekty",
+    duration: "~14 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "S1",
+    unlocks: ["PY1", "WEB1"],
+    summary: "Zaawansowane techniki Scratch — klony, listy, własne bloki.",
+    skills: ["Klonowanie duszków", "Listy (tablice)", "Własne bloki (funkcje)", "Efekty graficzne i dźwiękowe", "Debugowanie i optymalizacja"],
+    tools: ["Scratch 3.0", "TurboWarp"],
+    project: "Platformówka z wieloma poziomami, wrogami AI i systemem zapisu postępu",
+    outcomes: ["Tworzy wielopoziomowe gry", "Używa abstrakcji (własne bloki)", "Potrafi debugować i poprawiać cudzy kod"],
+  },
+
+  // ── BUILDER (11-12) ──
+  {
+    id: "PY1",
+    level: "builder",
+    title: "Python — Fundamenty",
+    subtitle: "Przejście na tekst",
+    duration: "~16 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "S2",
+    unlocks: ["PY2"],
+    summary: "Przejście z programowania wizualnego na tekstowe. Python jako pierwszy język.",
+    skills: ["Zmienne, typy danych, operatory", "Input/output", "Warunki (if/elif/else)", "Pętle (for, while)", "Funkcje — definiowanie i wywoływanie", "Podstawowe struktury danych (lista, słownik)"],
+    tools: ["Python 3", "Thonny / VS Code", "Replit"],
+    project: "Tekstowa gra RPG z postacią, ekwipunkiem (słownik) i systemem walki",
+    outcomes: ["Pisze programy w edytorze kodu", "Rozumie typowanie i błędy", "Tworzy i wywołuje własne funkcje"],
+  },
+  {
+    id: "WEB1",
+    level: "builder",
+    title: "Web — HTML & CSS",
+    subtitle: "Twoja pierwsza strona",
+    duration: "~12 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "S2",
+    unlocks: ["WEB2"],
+    summary: "Budowanie stron internetowych — struktura HTML i stylowanie CSS.",
+    skills: ["Struktura dokumentu HTML", "Tagi semantyczne", "CSS selektory i właściwości", "Flexbox i podstawy Grid", "Responsywność (media queries)", "Formularze HTML"],
+    tools: ["VS Code + Live Server", "Chrome DevTools", "Figma (podstawy)"],
+    project: "Portfolio osobiste — strona o sobie z galerią projektów, responsywna na mobile",
+    outcomes: ["Buduje wielostronicową witrynę", "Styluje za pomocą Flexbox/Grid", "Rozumie responsywność"],
+  },
+
+  // ── CREATOR (13-14) ──
+  {
+    id: "PY2",
+    level: "creator",
+    title: "Python — Średniozaawansowany",
+    subtitle: "Prawdziwe projekty",
+    duration: "~16 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "PY1",
+    unlocks: ["PY3", "DATA1"],
+    summary: "OOP, praca z plikami, API — Python jako narzędzie do prawdziwych problemów.",
+    skills: ["Klasy i obiekty (OOP)", "Moduły i pakiety (pip)", "Praca z plikami (JSON, CSV)", "Obsługa błędów (try/except)", "Podstawy API (requests)", "Git — podstawy kontroli wersji"],
+    tools: ["VS Code", "Git + GitHub", "API: OpenWeatherMap, PokeAPI"],
+    project: "Aplikacja pogodowa pobierająca dane z API, zapisująca historię do pliku JSON",
+    outcomes: ["Tworzy klasy i korzysta z OOP", "Pracuje z zewnętrznymi bibliotekami", "Używa Git do wersjonowania kodu"],
+  },
+  {
+    id: "WEB2",
+    level: "creator",
+    title: "Web — JavaScript",
+    subtitle: "Interaktywność",
+    duration: "~16 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "WEB1",
+    unlocks: ["WEB3"],
+    summary: "JavaScript w przeglądarce — DOM, zdarzenia, dynamiczne strony.",
+    skills: ["Zmienne, funkcje, pętle w JS", "DOM — selekcja i manipulacja", "Event listeners", "Fetch API i JSON", "LocalStorage", "Podstawy debugowania (DevTools)"],
+    tools: ["VS Code", "Chrome DevTools", "CodePen"],
+    project: "Aplikacja To-Do z localStorage, filtrami i animacjami CSS",
+    outcomes: ["Manipuluje DOM dynamicznie", "Obsługuje zdarzenia użytkownika", "Pobiera i wyświetla dane z API"],
+  },
+
+  // ── DEVELOPER (15-17) ──
+  {
+    id: "PY3",
+    level: "developer",
+    title: "Python — Zaawansowany",
+    subtitle: "Specjalizacja",
+    duration: "~16 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "PY2",
+    unlocks: [],
+    summary: "Zaawansowany Python — bazy danych, testy, automatyzacja, wprowadzenie do frameworków.",
+    skills: ["Bazy danych (SQLite + SQL)", "Testy jednostkowe (pytest)", "Automatyzacja (scripting, web scraping)", "Dekoratory i generatory", "Wstęp do Flask/FastAPI", "Deployment (Render/Railway)"],
+    tools: ["VS Code", "SQLite", "pytest", "Flask", "BeautifulSoup"],
+    project: "Mikro-aplikacja webowa (Flask) z bazą danych — np. system rezerwacji lub blog",
+    outcomes: ["Projektuje schemat bazy danych", "Pisze testy dla swojego kodu", "Deployuje aplikację w internecie"],
+  },
+  {
+    id: "WEB3",
+    level: "developer",
+    title: "Web — Frontend Framework",
+    subtitle: "Nowoczesne aplikacje",
+    duration: "~16 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "WEB2",
+    unlocks: [],
+    summary: "React lub Vue — budowanie nowoczesnych SPA, state management, komponenty.",
+    skills: ["Komponenty i props", "State i lifecycle", "Routing (SPA)", "Fetch + wyświetlanie danych", "Podstawy TypeScript", "Deployment (Vercel/Netlify)"],
+    tools: ["React / Vue", "Vite", "TypeScript", "Vercel"],
+    project: "Dashboard z danymi z API — np. tracker pogody, portfolio filmów lub panel statystyk",
+    outcomes: ["Buduje SPA z routingiem", "Zarządza stanem aplikacji", "Deployuje na Vercel/Netlify"],
+  },
+  {
+    id: "DATA1",
+    level: "developer",
+    title: "Dane i AI — Wprowadzenie",
+    subtitle: "Ścieżka dodatkowa",
+    duration: "~12 tygodni",
+    frequency: "1x/tyg, 90 min",
+    prereq: "PY2",
+    unlocks: [],
+    summary: "Analiza danych, wizualizacja i pierwsze kroki z uczeniem maszynowym.",
+    skills: ["Pandas — DataFrames", "Wizualizacja (matplotlib/plotly)", "Podstawy statystyki", "Czyszczenie danych", "Wstęp do ML (scikit-learn)", "Prompt engineering i korzystanie z AI"],
+    tools: ["Jupyter Notebook", "Pandas", "matplotlib", "scikit-learn", "ChatGPT API"],
+    project: "Analiza zbioru danych (np. Spotify, pogoda Kołobrzeg) z wizualizacją i prostym modelem predykcyjnym",
+    outcomes: ["Analizuje dane w Pandas", "Tworzy czytelne wykresy", "Rozumie podstawy ML i AI"],
+  },
+];
+
+const LEVEL_COLORS = {
+  explorer: { main: "var(--green)", dim: "var(--green-dim)", bright: "var(--green-bright)" },
+  builder: { main: "var(--cyan)", dim: "var(--cyan-dim)", bright: "var(--cyan)" },
+  creator: { main: "var(--amber)", dim: "var(--amber-dim)", bright: "var(--amber)" },
+  developer: { main: "var(--violet)", dim: "var(--violet-dim)", bright: "var(--violet)" },
+};
+
+/* ─── COMPONENTS ─── */
+
+const ModuleCard = ({ mod, isSelected, onClick, isUnlocked }) => {
+  const colors = LEVEL_COLORS[mod.level];
+  const level = Object.values(LEVELS).find(l => l.id === mod.level);
+
+  return (
+    <div
+      onClick={onClick}
+      style={{
+        background: isSelected ? colors.dim : "var(--card)",
+        border: `2px solid ${isSelected ? colors.main : "var(--border)"}`,
+        borderRadius: 14,
+        padding: "16px 18px",
+        cursor: "pointer",
+        transition: "all 0.25s ease",
+        opacity: isUnlocked ? 1 : 0.4,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {isSelected && (
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 3,
+          background: `linear-gradient(90deg, ${colors.main}, ${colors.bright})`,
+        }} />
+      )}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+        <span style={{
+          fontFamily: "'Fira Code', monospace", fontSize: 11, fontWeight: 500,
+          color: colors.main, background: colors.dim,
+          padding: "3px 8px", borderRadius: 6,
+        }}>
+          {mod.id}
+        </span>
+        <span style={{ fontSize: 11, color: "var(--text-dim)" }}>{mod.duration}</span>
+      </div>
+      <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{mod.title}</div>
+      <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 10 }}>{mod.subtitle}</div>
+      <div style={{ fontSize: 12, color: "var(--text-dim)", lineHeight: 1.5 }}>
+        {mod.summary.slice(0, 80)}{mod.summary.length > 80 ? "…" : ""}
+      </div>
+    </div>
+  );
+};
+
+const DetailPanel = ({ mod, onClose }) => {
+  const colors = LEVEL_COLORS[mod.level];
+  const level = Object.values(LEVELS).find(l => l.id === mod.level);
+
+  const Section = ({ title, children }) => (
+    <div style={{ marginBottom: 22 }}>
+      <div style={{
+        fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5,
+        color: colors.main, marginBottom: 8,
+      }}>
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+
+  return (
+    <div style={{
+      background: "var(--card)",
+      border: `1px solid var(--border)`,
+      borderRadius: 16,
+      padding: 28,
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: 4,
+        background: `linear-gradient(90deg, ${colors.main}, ${colors.bright || colors.main})`,
+      }} />
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20 }}>
+        <div>
+          <div style={{ display: "flex", gap: 10, alignItems: "center", marginBottom: 6 }}>
+            <span style={{
+              fontFamily: "'Fira Code', monospace", fontSize: 13, fontWeight: 500,
+              color: colors.main, background: colors.dim,
+              padding: "4px 10px", borderRadius: 6,
+            }}>
+              {mod.id}
+            </span>
+            <span style={{
+              fontSize: 11, background: colors.dim, color: colors.main,
+              padding: "3px 8px", borderRadius: 6,
+            }}>
+              {level.icon} {level.label} ({level.age} lat)
+            </span>
+          </div>
+          <h2 style={{ fontSize: 24, fontWeight: 700, marginBottom: 4 }}>{mod.title}</h2>
+          <div style={{ fontSize: 14, color: "var(--text-muted)" }}>{mod.subtitle}</div>
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            background: "var(--border)", border: "none", borderRadius: 8,
+            width: 32, height: 32, cursor: "pointer", color: "var(--text-muted)",
+            fontSize: 18, display: "flex", alignItems: "center", justifyContent: "center",
+          }}
+        >×</button>
+      </div>
+
+      <div style={{
+        display: "flex", gap: 16, marginBottom: 22, flexWrap: "wrap",
+      }}>
+        {[
+          { label: "Czas trwania", value: mod.duration },
+          { label: "Częstotliwość", value: mod.frequency },
+          { label: "Wymagania", value: mod.prereq ? `Moduł ${mod.prereq}` : "Brak" },
+        ].map((item, i) => (
+          <div key={i} style={{
+            background: "var(--bg)", borderRadius: 10, padding: "10px 14px", flex: "1 1 120px",
+          }}>
+            <div style={{ fontSize: 10, color: "var(--text-dim)", textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>{item.label}</div>
+            <div style={{ fontSize: 14, fontWeight: 500 }}>{item.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.7, marginBottom: 22 }}>
+        {mod.summary}
+      </div>
+
+      <Section title="Umiejętności">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {mod.skills.map((skill, i) => (
+            <span key={i} style={{
+              fontSize: 12, background: colors.dim, color: colors.main,
+              padding: "5px 10px", borderRadius: 8,
+            }}>
+              {skill}
+            </span>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Narzędzia">
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+          {mod.tools.map((tool, i) => (
+            <span key={i} style={{
+              fontSize: 12, background: "var(--bg)", color: "var(--text)",
+              padding: "5px 10px", borderRadius: 8, border: "1px solid var(--border)",
+            }}>
+              {tool}
+            </span>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Projekt końcowy">
+        <div style={{
+          background: "var(--bg)", borderRadius: 10, padding: 14,
+          borderLeft: `3px solid ${colors.main}`,
+          fontSize: 13, lineHeight: 1.6, color: "var(--text)",
+        }}>
+          🎯 {mod.project}
+        </div>
+      </Section>
+
+      <Section title="Efekty kształcenia">
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {mod.outcomes.map((outcome, i) => (
+            <div key={i} style={{
+              display: "flex", gap: 8, alignItems: "flex-start",
+              fontSize: 13, color: "var(--text-muted)", lineHeight: 1.5,
+            }}>
+              <span style={{ color: colors.main, flexShrink: 0 }}>✓</span>
+              {outcome}
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      {mod.unlocks.length > 0 && (
+        <Section title="Odblokowuje">
+          <div style={{ display: "flex", gap: 6 }}>
+            {mod.unlocks.map(id => {
+              const next = MODULES.find(m => m.id === id);
+              return next ? (
+                <span key={id} style={{
+                  fontSize: 12, background: LEVEL_COLORS[next.level].dim,
+                  color: LEVEL_COLORS[next.level].main,
+                  padding: "5px 10px", borderRadius: 8,
+                }}>
+                  {id}: {next.title} →
+                </span>
+              ) : null;
+            })}
+          </div>
+        </Section>
+      )}
+    </div>
+  );
+};
+
+/* ─── MAIN ─── */
+
+function CodingTreeMap() {
+  const [selected, setSelected] = useState(null);
+  const [viewMode, setViewMode] = useState("map"); // map | list
+  const detailRef = useRef(null);
+
+  const selectedMod = MODULES.find(m => m.id === selected);
+
+  useEffect(() => {
+    if (selectedMod && detailRef.current) {
+      detailRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [selected]);
+
+  const levelGroups = Object.values(LEVELS).map(level => ({
+    ...level,
+    modules: MODULES.filter(m => m.level === level.id),
+  }));
+
+  const totalWeeks = MODULES.reduce((sum, m) => {
+    const match = m.duration.match(/(\d+)/);
+    return sum + (match ? parseInt(match[1]) : 0);
+  }, 0);
+
+  return (
+    <div style={{ minHeight: "100vh", background: "var(--bg)", fontFamily: "'Outfit', sans-serif", color: "var(--text)" }}>
+      <style>{STYLE}</style>
+
+      {/* Header */}
+      <div style={{
+        padding: "32px 24px 24px",
+        borderBottom: "1px solid var(--border)",
+        background: "linear-gradient(180deg, #0f1a2e 0%, var(--bg) 100%)",
+      }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <span style={{ fontSize: 32 }}>🌳</span>
+            <h1 style={{ fontSize: 28, fontWeight: 800, letterSpacing: -0.5 }}>
+              Coding Tree
+              <span style={{ color: "var(--green)", marginLeft: 8 }}>Curriculum Map</span>
+            </h1>
+          </div>
+          <p style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 600, lineHeight: 1.6 }}>
+            Ścieżka kształcenia programistycznego dla grup 9-17 lat.
+            {MODULES.length} modułów • ~{totalWeeks} tygodni łącznego programu • 4 poziomy zaawansowania
+          </p>
+
+          {/* Stats row */}
+          <div style={{ display: "flex", gap: 12, marginTop: 18, flexWrap: "wrap" }}>
+            {levelGroups.map(lg => (
+              <div key={lg.id} style={{
+                background: LEVEL_COLORS[lg.id].dim,
+                borderRadius: 10, padding: "8px 14px",
+                display: "flex", alignItems: "center", gap: 8,
+              }}>
+                <span>{lg.icon}</span>
+                <span style={{ fontSize: 13, fontWeight: 600, color: LEVEL_COLORS[lg.id].main }}>
+                  {lg.label}
+                </span>
+                <span style={{ fontSize: 11, color: "var(--text-dim)" }}>
+                  {lg.age} lat • {lg.modules.length} moduły
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* View toggle */}
+          <div style={{ display: "flex", gap: 4, marginTop: 16 }}>
+            {[
+              { id: "map", label: "🗺 Mapa ścieżek" },
+              { id: "list", label: "📋 Lista modułów" },
+            ].map(v => (
+              <button
+                key={v.id}
+                onClick={() => setViewMode(v.id)}
+                style={{
+                  background: viewMode === v.id ? "var(--card)" : "transparent",
+                  border: `1px solid ${viewMode === v.id ? "var(--border)" : "transparent"}`,
+                  borderRadius: 8, padding: "7px 14px",
+                  fontSize: 13, color: viewMode === v.id ? "var(--text)" : "var(--text-dim)",
+                  cursor: "pointer", fontFamily: "'Outfit', sans-serif", fontWeight: 500,
+                }}
+              >
+                {v.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "24px 24px 60px" }}>
+
+        {viewMode === "map" ? (
+          /* ─── MAP VIEW ─── */
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            {levelGroups.map((lg, levelIdx) => (
+              <div key={lg.id}>
+                {/* Level header */}
+                <div style={{
+                  display: "flex", alignItems: "center", gap: 12, marginBottom: 16,
+                  paddingBottom: 12, borderBottom: `1px solid var(--border)`,
+                }}>
+                  <span style={{ fontSize: 24 }}>{lg.icon}</span>
+                  <div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: LEVEL_COLORS[lg.id].main }}>
+                      Poziom {levelIdx + 1}: {lg.label}
+                    </div>
+                    <div style={{ fontSize: 12, color: "var(--text-dim)" }}>
+                      Wiek {lg.age} lat • {lg.modules.length} {lg.modules.length === 1 ? "moduł" : lg.modules.length < 5 ? "moduły" : "modułów"}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Module cards grid */}
+                <div style={{
+                  display: "grid",
+                  gridTemplateColumns: `repeat(auto-fill, minmax(260px, 1fr))`,
+                  gap: 14,
+                }}>
+                  {lg.modules.map(mod => (
+                    <ModuleCard
+                      key={mod.id}
+                      mod={mod}
+                      isSelected={selected === mod.id}
+                      isUnlocked={true}
+                      onClick={() => setSelected(selected === mod.id ? null : mod.id)}
+                    />
+                  ))}
+                </div>
+
+                {/* Connection arrows hint */}
+                {levelIdx < levelGroups.length - 1 && (
+                  <div style={{
+                    display: "flex", justifyContent: "center", padding: "16px 0 0",
+                  }}>
+                    <div style={{
+                      width: 2, height: 28,
+                      background: `linear-gradient(${LEVEL_COLORS[lg.id].main}, ${LEVEL_COLORS[levelGroups[levelIdx + 1].id].main})`,
+                      borderRadius: 2,
+                    }} />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          /* ─── LIST VIEW ─── */
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {MODULES.map((mod, i) => {
+              const colors = LEVEL_COLORS[mod.level];
+              const level = Object.values(LEVELS).find(l => l.id === mod.level);
+              return (
+                <div
+                  key={mod.id}
+                  onClick={() => setSelected(selected === mod.id ? null : mod.id)}
+                  style={{
+                    background: selected === mod.id ? colors.dim : "var(--card)",
+                    border: `1px solid ${selected === mod.id ? colors.main : "var(--border)"}`,
+                    borderRadius: 12, padding: "14px 18px",
+                    cursor: "pointer", transition: "all 0.2s",
+                    display: "flex", alignItems: "center", gap: 16,
+                  }}
+                >
+                  <span style={{
+                    fontFamily: "'Fira Code', monospace", fontSize: 13, fontWeight: 600,
+                    color: colors.main, background: colors.dim,
+                    padding: "4px 10px", borderRadius: 6, flexShrink: 0,
+                  }}>
+                    {mod.id}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600 }}>{mod.title}</div>
+                    <div style={{ fontSize: 12, color: "var(--text-dim)" }}>{mod.subtitle}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
+                    <span style={{
+                      fontSize: 10, background: colors.dim, color: colors.main,
+                      padding: "3px 8px", borderRadius: 6,
+                    }}>
+                      {level.icon} {level.label}
+                    </span>
+                    <span style={{ fontSize: 11, color: "var(--text-dim)" }}>{mod.duration}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Detail panel */}
+        {selectedMod && (
+          <div ref={detailRef} style={{ marginTop: 24 }}>
+            <DetailPanel mod={selectedMod} onClose={() => setSelected(null)} />
+          </div>
+        )}
+
+        {/* Legend / flow */}
+        <div style={{
+          marginTop: 40, padding: 24,
+          background: "var(--card)", borderRadius: 16, border: "1px solid var(--border)",
+        }}>
+          <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1.5, color: "var(--text-dim)", marginBottom: 14 }}>
+            Schemat progresji
+          </div>
+          <div style={{ fontFamily: "'Fira Code', monospace", fontSize: 13, lineHeight: 2.2, color: "var(--text-muted)" }}>
+            <span style={{ color: "var(--green)" }}>CT1</span>
+            <span style={{ color: "var(--text-dim)" }}> → </span>
+            <span style={{ color: "var(--green)" }}>S1</span>
+            <span style={{ color: "var(--text-dim)" }}> → </span>
+            <span style={{ color: "var(--green)" }}>S2</span>
+            <span style={{ color: "var(--text-dim)" }}> ┬→ </span>
+            <span style={{ color: "var(--cyan)" }}>PY1</span>
+            <span style={{ color: "var(--text-dim)" }}> → </span>
+            <span style={{ color: "var(--amber)" }}>PY2</span>
+            <span style={{ color: "var(--text-dim)" }}> ┬→ </span>
+            <span style={{ color: "var(--violet)" }}>PY3</span>
+            <br />
+            <span style={{ color: "var(--text-dim)", marginLeft: 0 }}>{"                              "}</span>
+            <span style={{ color: "var(--text-dim)" }}>│{"                              "}└→ </span>
+            <span style={{ color: "var(--violet)" }}>DATA1</span>
+            <span style={{ color: "var(--text-dim)" }}> (opcjonalny)</span>
+            <br />
+            <span style={{ color: "var(--text-dim)" }}>{"                              "}└→ </span>
+            <span style={{ color: "var(--cyan)" }}>WEB1</span>
+            <span style={{ color: "var(--text-dim)" }}> → </span>
+            <span style={{ color: "var(--amber)" }}>WEB2</span>
+            <span style={{ color: "var(--text-dim)" }}> → </span>
+            <span style={{ color: "var(--violet)" }}>WEB3</span>
+          </div>
+          <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 12, lineHeight: 1.6 }}>
+            Po module S2 (Scratch Zaawansowany) uczeń wybiera ścieżkę Python lub Web (lub obie równolegle).
+            Ścieżka Python otwiera dodatkową gałąź Data & AI na poziomie Developer.
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<CodingTreeMap />);
+</script>
+</body>
+</html>

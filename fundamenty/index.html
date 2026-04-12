@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Tree — Fundamenty myślenia</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #faf8f5; font-family: 'Nunito', 'Segoe UI', sans-serif; color: #1a1a2e; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+const { useState, useRef, useEffect } = React;
+
+const SECTIONS = [
+  {
+    id: "comp_thinking",
+    icon: "🧮",
+    title: "Myślenie komputacyjne",
+    color: "#00897b",
+    colorDim: "#e0f2f1",
+    desc: "Jak myśli programista — rozbijanie problemów, szukanie wzorców, upraszczanie.",
+    concepts: [
+      {
+        name: "Dekompozycja",
+        explain: "Rozbijanie dużego problemu na małe kawałki. Duży problem jest straszny — małe kawałki są łatwe.",
+        analogy: "Budowa domu w Minecrafcie: nie budujesz 'dom'. Budujesz: fundamenty → ściany → dach → drzwi → meble. Kawałek po kawałku.",
+        programming: "Duży program = wiele małych funkcji. Zamiast jednego kodu na 500 linii — 20 funkcji po 25 linii. Każda robi jedną rzecz.",
+        question: "Jak rozłożyłbyś problem 'zorganizuj urodziny' na 5 mniejszych zadań?",
+        task: "Weź problem: 'stwórz grę w Scratch'. Rozłóż go na 8 podzadań. Dla każdego napisz jedno zdanie, co trzeba zrobić."
+      },
+      {
+        name: "Rozpoznawanie wzorców",
+        explain: "Zauważanie, że coś się powtarza lub jest podobne do czegoś innego. Wzorzec = powtarzający się schemat.",
+        analogy: "W grach: każdy boss ma pattern (wzorzec ataku). 3 uderzenia → pauza → atak specjalny. Rozpoznajesz wzorzec → wygrywasz.",
+        programming: "Pętla to wzorzec: coś się powtarza. Zamiast pisać 100 razy to samo — piszesz pętlę. Widzisz wzorzec → upraszczasz kod.",
+        question: "Jaki wzorzec widzisz w: 2, 4, 8, 16, 32, ...? A w dniach tygodnia?",
+        task: "Narysuj 3 wzory (np. ▲○▲○▲○). Kolega musi kontynuować. Potem zaprogramujcie jeden wzór w Scratch — duszek rysuje go automatycznie."
+      },
+      {
+        name: "Abstrakcja",
+        explain: "Ukrywanie szczegółów, które teraz nie są ważne. Skupianie się na tym, co istotne.",
+        analogy: "Mapa metra: nie pokazuje każdej ulicy, budynku, drzewa. Pokazuje TYLKO stacje i linie. Bo to jedyne, co ci potrzebne do podróży.",
+        programming: "Funkcja to abstrakcja: wiesz CO robi (sortuje listę), nie musisz wiedzieć JAK. Używasz sort() bez znajomości algorytmu wewnątrz.",
+        question: "Gdybyś miał opisać szkołę kosmicie w 3 zdaniach — co byś zostawił, a co byś pominął? To abstrakcja!",
+        task: "Narysuj mapę szkoły z TYLKO 5 elementami (to, co najważniejsze). Porównaj z kolegą — co wybraliście inaczej? Dlaczego?"
+      },
+      {
+        name: "Generalizacja",
+        explain: "Gdy rozwiązanie jednego problemu działa też dla innych podobnych problemów. Rozwiążesz raz — stosujesz wszędzie.",
+        analogy: "Nauczyłeś się grać jedną postacią w bijatyce. Inny bohater ma podobne combo — od razu umiesz! Przeniosłeś wiedzę.",
+        programming: "Funkcja sumuj(a, b) działa dla DOWOLNYCH dwóch liczb. Nie piszesz osobnej funkcji dla 2+3, osobnej dla 5+7. Generalizujesz!",
+        question: "Umiesz przejść przez jedno przejście dla pieszych. Czy musisz się uczyć osobno dla każdego? Dlaczego nie?",
+        task: "Napisz funkcję, która zamienia temperaturę z Celsjusza na Fahrenheita. Przetestuj ją dla 5 różnych wartości. Jedna funkcja — wiele zastosowań!"
+      },
+      {
+        name: "Sekwencja",
+        explain: "Kolejność ma znaczenie! Instrukcje wykonywane krok po kroku, jedna po drugiej.",
+        analogy: "Przepis: najpierw wbijesz jajka, potem smaży. Nie odwrotnie! W grze: najpierw logujesz się, potem grasz. Kolejność = sekwencja.",
+        programming: "Kod wykonuje się linia po linii, od góry do dołu. Zamień dwie linie miejscami — program może się zepsuć!",
+        question: "Co się stanie, jeśli najpierw wlejsz mleko, a potem włożysz kubek? Kolejność ma znaczenie!",
+        task: "Napisz algorytm 'mycie rąk' w 8 krokach. Wymieszaj je losowo. Kolega musi je ułożyć w poprawną sekwencję."
+      },
+      {
+        name: "Schemat blokowy",
+        explain: "Rysunek, który pokazuje jak działa program lub proces — krok po kroku, z decyzjami (TAK/NIE).",
+        analogy: "Mapa w escape room: idziesz korytarzem → drzwi zamknięte? → TAK: szukaj klucza → NIE: idź dalej. To schemat blokowy!",
+        programming: "Przed pisaniem kodu warto narysować schemat blokowy. To jak plan budowy — widzisz całość zanim zaczniesz kodować.",
+        question: "Narysuj schemat blokowy swojego poranku: od budzika do wyjścia z domu. Ile decyzji (TAK/NIE) podejmujesz?",
+        task: "Narysuj schemat blokowy gry 'Zgadnij liczbę 1-100': komputer losuje, gracz zgaduje, komputer mówi za dużo/za mało. Potem zaprogramuj to!"
+      },
+      {
+        name: "Pseudokod",
+        explain: "Zapis programu zwykłym językiem (polskim!), bez martwienia się o składnię. Plan w ludzkich słowach.",
+        analogy: "Jak opisanie filmu koleżance zanim go obejrzy. Nie odtwarzasz filmu — opowiadasz, co się dzieje, w skrócie.",
+        programming: "Zanim napiszesz kod: POWTARZAJ 10 RAZY: losuj liczbę, JEŚLI > 5 TO wypisz ją. Potem zamieniasz na prawdziwy kod.",
+        question: "Napisz pseudokod dla 'wybrania najlepszego miejsca w autobusie'. Jakie kroki? Jakie warunki?",
+        task: "Napisz pseudokod gry 'Kamień, Nożyce, Papier' (gracz vs komputer). Potem zamień go na prawdziwy Scratch/Python."
+      }
+    ]
+  },
+  {
+    id: "logic",
+    icon: "🔮",
+    title: "Logika",
+    color: "#5c6bc0",
+    colorDim: "#e8eaf6",
+    desc: "Jak myśleć precyzyjnie — prawda, fałsz, warunki i wnioskowanie.",
+    concepts: [
+      {
+        name: "Prawda / Fałsz (Boolean)",
+        explain: "Każde stwierdzenie jest albo prawdziwe, albo fałszywe. Nie ma 'trochę prawdziwe'. To fundament logiki i programowania.",
+        analogy: "Przełącznik światła: ON albo OFF. Drzwi: otwarte albo zamknięte. W grze: quest ukończony = true, nieukończony = false.",
+        programming: "Boolean: true/false. Każdy warunek if zwraca true albo false. if (wiek >= 18) → true = wpuść, false = nie wpuść.",
+        question: "'Pada deszcz' — prawda czy fałsz? A 'ten film jest fajny' — czy to DA SIĘ określić jako prawdę/fałsz? Dlaczego nie?",
+        task: "Napisz 10 stwierdzeń. Oznacz każde jako TRUE lub FALSE. Uwaga: 3 z nich muszą być takie, o które można się spierać — przedyskutujcie!"
+      },
+      {
+        name: "I / ORAZ (AND)",
+        explain: "Dwie rzeczy muszą być prawdziwe JEDNOCZEŚNIE. Jedziesz na wycieczkę JEŚLI masz zgodę rodziców I zapłaciłeś.",
+        analogy: "Boss w grze jest nietykalny DOPÓKI tarcza jest aktywna I jest w trybie ataku. Musisz złamać OBA warunki.",
+        programming: "if (hasKey == true AND door == closed) → otwórz drzwi. Obie rzeczy muszą być true.",
+        question: "Żeby kupić bilet na film 16+: musisz mieć 16 lat I mieć pieniądze. Co jeśli masz jedno, ale nie drugie?",
+        task: "Stwórz 'zamek logiczny': drzwi otwierają się TYLKO gdy przycisk A jest wciśnięty I przycisk B jest wciśnięty jednocześnie."
+      },
+      {
+        name: "LUB (OR)",
+        explain: "Wystarczy, że JEDNA z rzeczy jest prawdziwa. Idziesz do kina JEŚLI masz bilet LUB znasz kogoś, kto cię wpuści.",
+        analogy: "W grze dostajesz XP JEŚLI pokonasz wroga LUB ukończysz quest. Wystarczy jedno (ale oba też OK!).",
+        programming: "if (keyPressed == 'W' OR keyPressed == 'ArrowUp') → idź do góry. Dwa sposoby na ten sam efekt.",
+        question: "'Mogę pójść do parku JEŚLI jest ładnie LUB mam parasol.' Kiedy NIE pójdziesz?",
+        task: "Alarm w Scratch: duszek krzyczy JEŚLI dotyka czerwonego LUB dotyka granicy ekranu. Przetestuj oba warunki osobno i razem."
+      },
+      {
+        name: "NIE / NEGACJA (NOT)",
+        explain: "Odwrócenie prawdy. Jeśli coś jest prawdą, negacja czyni to fałszem. I odwrotnie.",
+        analogy: "Tryb niewidzialności w grze: NOT widoczny = niewidzialny. Odwracasz stan.",
+        programming: "if (NOT gameOver) → kontynuuj grę. Dopóki gra NIE jest skończona — graj dalej.",
+        question: "Zaprzecz: 'Wszystkie koty są czarne'. Czy wystarczy znaleźć jednego nieczarnego kota?",
+        task: "Przycisk pauzy w grze: kliknięcie zmienia pauza = NOT pauza. True staje się false, false staje się true. Zaimplementuj!"
+      },
+      {
+        name: "Warunek (IF / THEN)",
+        explain: "JEŚLI coś jest prawdą, TO zrób coś. Najbardziej fundamentalna konstrukcja w programowaniu i myśleniu.",
+        analogy: "JEŚLI pada deszcz → weź parasol. JEŚLI wróg blisko → atakuj. JEŚLI głodny → jedz. Codziennie podejmujesz setki takich decyzji!",
+        programming: "if (score >= 100) { level_up(); } — JEŚLI wynik ≥ 100, TO awansuj na wyższy level.",
+        question: "Ile decyzji 'JEŚLI/TO' podjąłeś dzisiaj rano? Spróbuj policzyć — będzie ich więcej niż myślisz!",
+        task: "Stwórz chatbota w Scratch: JEŚLI użytkownik pisze 'cześć' → odpowiedz 'hej!', JEŚLI 'jak się masz' → 'dobrze!', W PRZECIWNYM RAZIE → 'nie rozumiem\'."
+      },
+      {
+        name: "Implikacja (JEŚLI... TO...)",
+        explain: "Związek między dwiema rzeczami: JEŚLI A jest prawdą, TO B też. Ale uwaga: jeśli A jest fałszem — o B nic nie wiemy!",
+        analogy: "JEŚLI zdasz egzamin, TO dostaniesz rower. Ale jeśli NIE zdasz — może i tak dostaniesz (mama jest miła). Implikacja działa w jedną stronę!",
+        programming: "JEŚLI użytkownik jest adminem, TO ma dostęp do panelu. Ale brak dostępu NIE znaczy, że nie jest adminem — może nie jest zalogowany.",
+        question: "'JEŚLI pada, TO trawa jest mokra.' Trawa jest mokra — czy na pewno padało? (Może ktoś podlewał ogród!)",
+        task: "Wymyśl 3 implikacje. Dla każdej sprawdźcie: czy działa w drugą stronę? (Zwykle nie!) To częsty błąd logiczny."
+      }
+    ]
+  },
+  {
+    id: "world",
+    icon: "🌍",
+    title: "Świat i rzeczy",
+    color: "#2ecc71",
+    colorDim: "#e8f8f0",
+    desc: "Wszystko, co istnieje wokół nas — z czego się składa i co się z tym dzieje.",
+    concepts: [
+      {
+        name: "Obiekt",
+        explain: "Cokolwiek, co możemy nazwać i o czym możemy myśleć. Może być fizyczne (piłka) lub wirtualne (postać w grze).",
+        analogy: "W Minecrafcie każdy blok, mob, narzędzie — to obiekt. Ma cechy (kolor, wytrzymałość) i zachowania (spada, wybucha).",
+        programming: "W programowaniu obiekt to 'rzecz' z właściwościami. Postać w Scratch ma x, y, kostium, rozmiar — to jej właściwości.",
+        question: "Wymień 5 obiektów w tym pokoju. A teraz 3 obiekty, które nie istnieją fizycznie (np. są w telefonie).",
+        task: "W Scratch stwórz duszka 'Piłka' z trzema właściwościami: kolor, rozmiar, szybkość. Zmień każdą po kliknięciu."
+      },
+      {
+        name: "Materia",
+        explain: "Wszystko, co zajmuje miejsce i ma masę. Można tego dotknąć (albo przynajmniej zważyć).",
+        analogy: "W Minecrafcie materia to bloki — kamień, drewno, woda. Każdy zajmuje jedno pole. Powietrze też jest materią!",
+        programming: "W programowaniu dane to 'cyfrowa materia' — zajmują miejsce w pamięci komputera, tak jak bloki zajmują miejsce w grze.",
+        question: "Czy światło to materia? Czy dźwięk? Czy myśl? Dlaczego tak lub nie?",
+        task: "Zrób listę 10 rzeczy. Podziel na 'materia' i 'nie materia'. Przedyskutujcie kontrowersyjne przypadki."
+      },
+      {
+        name: "Energia",
+        explain: "Zdolność do zmieniania czegoś. Bez energii nic się nie rusza, nie świeci, nie grzeje.",
+        analogy: "W grach masz pasek energii / many / staminy. Jak się skończy — nie możesz nic robić. Jedzenie = twoje 'ładowanie energii'.",
+        programming: "W grze: jeśli energia > 0, postać może biegać. Jeśli 0 — stoi. Energia to zmienna, która decyduje, co możesz zrobić.",
+        question: "Skąd telefon bierze energię? A ty? A Słońce?",
+        task: "Postać ma 100 energii. Każdy ruch kosztuje 5. Gdy 0 → mówi 'Muszę odpocząć!' i stoi 3 sekundy."
+      },
+      {
+        name: "Ruch",
+        explain: "Zmiana pozycji czegoś w czasie. Coś było tu, teraz jest tam.",
+        analogy: "Ruch joystickiem = zmiana pozycji postaci. W Minecrafcie WASD zmienia twoje x, y, z.",
+        programming: "W Scratch: 'zmień x o 10' = ruch. To zmiana liczby (pozycji) w czasie.",
+        question: "Czy Ziemia się rusza? Czy siedzisz nieruchomo? (Ziemia kręci się z prędkością ~1670 km/h!)",
+        task: "Animacja piłki, która odbija się od ścian. Użyj zmiennych prędkośćX i prędkośćY."
+      },
+      {
+        name: "Zmiana",
+        explain: "Gdy coś jest inne niż wcześniej. Może być szybka (eksplozja) albo powolna (rdzewienie).",
+        analogy: "Crafting w Minecrafcie to zmiana — bierzesz drewno, dostajesz deski. Wejście → proces → wyjście.",
+        programming: "Każda instrukcja w programie powoduje zmianę. Program bez zmian = program, który nic nie robi.",
+        question: "Co się zmieniło od rana do teraz? 3 zmiany widoczne i 3 niewidoczne.",
+        task: "Duszek zmienia kolor co 2 sekundy, przechodzi przez 5 stanów i wraca do początku. Cykl zmian."
+      }
+    ]
+  },
+  {
+    id: "interactions",
+    icon: "🔌",
+    title: "Oddziaływania i wpływ",
+    color: "#e67e22",
+    colorDim: "#fef0e0",
+    desc: "Jak rzeczy wpływają na siebie — nawet na odległość.",
+    concepts: [
+      {
+        name: "Ładunek",
+        explain: "Własność, która sprawia, że coś przyciąga lub odpycha inne rzeczy. Jak etykieta: 'jestem + lub −'.",
+        analogy: "Jak w relacjach: niektórzy ludzie się przyciągają, inni odpychają. W grach: frakcja decyduje kto jest sojusznikiem.",
+        programming: "W kodzie to jak flaga true/false. Ładunek = właściwość zmieniająca zachowanie obiektu wobec innych.",
+        question: "Potarłeś balon o włosy i przykleja się do ściany. Co się stało?",
+        task: "Dwa duszki: '+' i '−'. Blisko — przyciągają się. Dwa takie same — odpychają się."
+      },
+      {
+        name: "Pole (obszar wpływu)",
+        explain: "Niewidoczny obszar wokół czegoś, gdzie ten 'ktoś' ma wpływ. Jak WiFi — nie widzisz go, ale działa w zasięgu.",
+        analogy: "Zasięg WiFi routera to pole. Im dalej — tym słabszy sygnał. Magnes przyciąga spinacze, ale nie z drugiego pokoju.",
+        programming: "W grze: 'jeśli odległość A-B < 100 pikseli, to A wpływa na B'. To programujesz pole!",
+        question: "Jakie niewidzialne 'pola' działają wokół ciebie teraz? (WiFi, grawitacja, ciepło...)",
+        task: "'Magnes' — duszek przyciąga inne obiekty, gdy bliżej niż 150px. Im bliżej, tym mocniej."
+      },
+      {
+        name: "Siła",
+        explain: "Coś, co zmienia ruch obiektu — przyspiesza go, zwalnia, albo zmienia kierunek.",
+        analogy: "Kopnięcie piłki = siła. Hamulec = siła. W grach: boost, gravity, knockback — to siły.",
+        programming: "Siła to zmiana prędkości: prędkość = prędkość + siła. Gravity to siła ciągnąca w dół co klatkę.",
+        question: "Dlaczego kopnięta piłka w końcu się zatrzymuje? Jakie siły na nią działają?",
+        task: "Platformówka z grawitacją: co klatkę prędkośćY -= 1. Spacja = skok (prędkośćY = +15)."
+      },
+      {
+        name: "Oddziaływanie",
+        explain: "Gdy rzeczy wpływają na siebie nawzajem. Piłka uderza w ścianę — ściana zmienia ruch piłki, piłka naciska na ścianę.",
+        analogy: "Handel w grze: dajesz złoto, dostajesz miecz. Oba obiekty się zmieniły. Oddziaływanie jest dwustronne!",
+        programming: "Kolizja duszków: oba reagują. Jeden traci HP, drugi się odbija. Zaprogramowane oddziaływanie.",
+        question: "Gdy siadasz na krześle — czy tylko ty działasz na krzesło, czy ono też na ciebie?",
+        task: "Dwa duszki poruszają się losowo. Zderzenie → oba zmieniają kierunek i kolor. Wzajemne oddziaływanie."
+      },
+      {
+        name: "Źródło",
+        explain: "Miejsce, z którego coś pochodzi lub się zaczyna. Każda energia, każdy sygnał ma swoje źródło.",
+        analogy: "Żarówka to źródło światła. Serwer to źródło danych gry. Bez źródła — nie ma efektu.",
+        programming: "Źródło danych: input użytkownika, baza danych, API — to źródła informacji w programie.",
+        question: "Jakie jest źródło dźwięku, który teraz słyszysz? A źródło prądu w gniazdku?",
+        task: "'Emiter cząstek' — duszek co 0.5s tworzy klona lecącego w losowym kierunku."
+      }
+    ]
+  },
+  {
+    id: "rules",
+    icon: "📐",
+    title: "Zasady i reguły",
+    color: "#e74c3c",
+    colorDim: "#fde8e8",
+    desc: "Świat działa według zasad. Jak je rozpoznać?",
+    concepts: [
+      {
+        name: "Reguła",
+        explain: "Coś, co działa zawsze tak samo. 'Upuścisz piłkę — spadnie.' Nie trzeba sprawdzać za każdym razem.",
+        analogy: "W szachach wieża jeździ prosto. Zawsze. W Minecrafcie woda płynie w dół. To reguła tego świata.",
+        programming: "if/then to reguła w kodzie. 'JEŚLI gracz dotknie lawy, TO traci HP.' Program to zbiór reguł!",
+        question: "Wymień 3 reguły, których nikt cię nie uczył, ale znasz z doświadczenia.",
+        task: "5 reguł wymyślonej gry w formie: JEŚLI [warunek] TO [skutek]. Zaprogramuj jedną."
+      },
+      {
+        name: "Prawo (naukowe)",
+        explain: "Reguła działająca ZAWSZE i WSZĘDZIE — sprawdzona tysiące razy. Jak reguła gry, ale dla wszechświata.",
+        analogy: "Grawitacja to jak reguła Minecrafta 'piasek spada'. Działa zawsze, nikt tego nie wyłączy.",
+        programming: "Prawa programowania: 'zmienna musi być zdefiniowana przed użyciem'. Złamanie = błąd.",
+        question: "Czy prawo naukowe może się zmienić? Czym różni się od prawa stanowionego przez ludzi?",
+        task: "Mini-świat z 3 'prawami': grawitacja, odbijanie od ścian, tarcie. Czy wygląda realistycznie?"
+      },
+      {
+        name: "Zależność",
+        explain: "Gdy jedno zależy od drugiego. 'Im bardziej naciskasz gaz, tym szybciej jedzie auto.'",
+        analogy: "Im więcej XP, tym wyższy level. Im droższy miecz, tym więcej obrażeń. To zależności!",
+        programming: "obrażenia = siła_ataku * mnożnik_krytyczny. Jedna zmienna zależy od drugiej.",
+        question: "Od czego zależy twoja ocena w szkole? Wymień 3 rzeczy.",
+        task: "Suwak 'siła wiatru' (1-10). Im wyższa wartość, tym szybciej duszek-chmura się rusza."
+      },
+      {
+        name: "Przyczyna i skutek",
+        explain: "Coś się stało (przyczyna) → coś innego się stało z tego powodu (skutek). Jak kostki domina.",
+        analogy: "Kliknąłeś 'Kup' (przyczyna) → straciłeś złoto, dostałeś przedmiot (skutek).",
+        programming: "Event → Handler. Kliknięcie (przyczyna) → funkcja się wykonuje (skutek). Program = łańcuch przyczyn i skutków.",
+        question: "Padasz na rowerze. Jakie przyczyny? Jakie skutki? Czy skutek może być przyczyną kolejnej rzeczy?",
+        task: "Łańcuch domina: 5 duszków w rzędzie. Popchnij pierwszego → uderza drugiego → itd."
+      }
+    ]
+  },
+  {
+    id: "building_blocks",
+    icon: "⚛️",
+    title: "Budulec świata",
+    color: "#9b59b6",
+    colorDim: "#f3e8fa",
+    desc: "Z czego jest zbudowane dosłownie wszystko?",
+    concepts: [
+      {
+        name: "Atom",
+        explain: "Maleńka cegiełka, z której zbudowane jest wszystko. Miliard atomów mieści się na końcu włosa.",
+        analogy: "Klocki LEGO. Z kilku podstawowych klocków budujesz dom, samochód, smoka. Atomy to LEGO przyrody.",
+        programming: "'Atomy' kodu to podstawowe typy: liczba, tekst, prawda/fałsz. Z nich budujesz wszystko.",
+        question: "Z ilu atomów się składasz? (~7 000 000 000 000 000 000 000 000 000!)",
+        task: "3 typy 'atomów' (kolorowe kółka). Przeciągnij obok siebie → tworzą molekuły (woda = 2 niebieskie + 1 czerwone)."
+      },
+      {
+        name: "Cząstka",
+        explain: "Bardzo mały kawałek czegoś. Atom to cząstka materii. Ale są cząstki jeszcze mniejsze!",
+        analogy: "Piksel na ekranie. Jeden to prawie nic. Miliony pikseli = obraz. Cząstki to piksele materii.",
+        programming: "Particles w grach — małe elementy tworzące efekty: dym, ogień, śnieg.",
+        question: "Czy wodę można dzielić w nieskończoność? Kiedy przestaje być wodą?",
+        task: "Kliknięcie → 20 klonów leci losowo i znika po 2s. Efekt eksplozji!"
+      },
+      {
+        name: "Elektron",
+        explain: "Lekka cząstka krążąca wokół atomu. Ma ładunek ujemny. Przepływ elektronów to prąd!",
+        analogy: "Elektrony to woda w rurach. Bateria to pompa. Kabel to rura. Żarówka to młyn wodny.",
+        programming: "Elektrony w procesorze to podstawa komputera. Każdy bit (0/1) to wynik przepływu elektronów!",
+        question: "Co się dzieje, gdy włączasz latarkę? Skąd biorą się elektrony?",
+        task: "Żółte kółeczka poruszają się w pętli (obwód). Przełącznik włącza/wyłącza ruch."
+      },
+      {
+        name: "Proton",
+        explain: "Ciężka cząstka w jądrze atomu. Ładunek dodatni. Liczba protonów = typ atomu (1=wodór, 79=złoto).",
+        analogy: "Dowód osobisty atomu. Numer protonów = tożsamość. 6 protonów = węgiel, 8 = tlen.",
+        programming: "Jak ID w bazie danych. user_id = 1 to Jan. proton_count = element_id.",
+        question: "Co trzeba zrobić, żeby zmienić ołów w złoto? (Zmienić liczbę protonów!)",
+        task: "Kreator atomów: suwak 1-10 protonów → wyświetla nazwę pierwiastka."
+      },
+      {
+        name: "Kwark",
+        explain: "Jeszcze mniejszy niż proton! Proton = 3 kwarki. Klocek wewnątrz klocka — najgłębszy poziom.",
+        analogy: "Piksele w pikselu. Klocek LEGO wygląda na jeden kawałek, ale ma mniejsze części wewnątrz.",
+        programming: "Zagnieżdżone struktury: obiekt w obiekcie. class Proton { kwarki: [k1, k2, k3] }. Warstwy abstrakcji!",
+        question: "Czy kwarki składają się z czegoś jeszcze mniejszego? Czy jest ostatni poziom?",
+        task: "Piramida zoom-in: CIAŁO → KOMÓRKA → CZĄSTECZKA → ATOM → PROTON → KWARK."
+      }
+    ]
+  },
+  {
+    id: "properties",
+    icon: "🔢",
+    title: "Własności i liczby",
+    color: "#3498db",
+    colorDim: "#e4f0fb",
+    desc: "Jak opisujemy rzeczy za pomocą liczb i wartości.",
+    concepts: [
+      {
+        name: "Liczba",
+        explain: "Sposób na opisanie 'ile' czegoś jest. Bez liczb nie opiszesz świata precyzyjnie.",
+        analogy: "HP: 85. Złoto: 1200. Level: 14. Każda liczba opisuje coś konkretnego w grze.",
+        programming: "Programy to operacje na liczbach. x = 10, score = score + 1, if health <= 0...",
+        question: "Czy istnieje coś, czego NIE da się opisać liczbą?",
+        task: "Karta postaci: duszek z 5 właściwościami liczbowymi (HP, atak, obrona, szybkość, szczęście)."
+      },
+      {
+        name: "Wartość",
+        explain: "To, co kryje się za nazwą. Zmienna 'imię' ma wartość 'Ania'. Zmienna 'wiek' ma wartość 12.",
+        analogy: "Miecz ma atak = 25. '25' to wartość. Może się zmienić (ulepszenie → 30).",
+        programming: "let score = 0. 'score' to nazwa, '0' to wartość. Wartość się zmienia: score += 10.",
+        question: "Jakie 'wartości' opisują ciebie? (wzrost, wiek, kolor oczu...)",
+        task: "Sklep: 3 przedmioty z ceną. Gracz kupuje → złoto maleje, ekwipunek rośnie."
+      },
+      {
+        name: "Zmienna",
+        explain: "Pudełko z etykietą, do którego wkładasz wartość. Możesz zmienić zawartość, etykieta zostaje.",
+        analogy: "Szafka z twoim nazwiskiem. Dziś kurtka, jutro plecak. Szafka ta sama, zawartość inna.",
+        programming: "let temperatura = 22. Jutro: temperatura = 18. Nazwa ta sama, wartość inna. Dlatego 'zmienna'!",
+        question: "Jakie zmienne zmieniają się w ciągu dnia? (głód, temperatura, bateria telefonu...)",
+        task: "3 zmienne: głód, energia, radość. Co sekundę głód rośnie, energia maleje. 'Jedz' → głód -20, energia +10."
+      },
+      {
+        name: "Kwantyzacja (porcje)",
+        explain: "Niektóre rzeczy istnieją tylko w paczkach — nie da się mieć pół paczki. Jest 1 grosz, ale nie pół grosza.",
+        analogy: "W Minecrafcie: 1, 2, 3 bloki — nie 2.5 bloku. Bloki są 'skwantyzowane'.",
+        programming: "Integer vs Float. int = porcje (1,2,3). Math.floor() zamienia ciągłą liczbę na porcję.",
+        question: "Czy możesz kupić pół jajka? A pół litra mleka? Dlaczego jedno tak, a drugie nie?",
+        task: "Suwak 0-100 (ciągły). Obok wersja zaokrąglona do 10. Pokaż różnicę wizualnie."
+      },
+      {
+        name: "Ciągłość vs porcje",
+        explain: "Niektóre rzeczy zmieniają się płynnie (temperatura), inne skokowo (piętro w budynku).",
+        analogy: "Rampa vs schody. Rampa = ciągłość. Schody = porcje (tylko konkretne poziomy).",
+        programming: "Animacja 60fps = wygląda ciągle, ale to 60 osobnych klatek! Komputer udaje ciągłość porcjami.",
+        question: "Czas płynie ciągle czy w porcjach? A film? (24 klatki/s!)",
+        task: "Dwa duszki z A do B. Jeden płynnie (+1px/klatkę). Drugi skacze co 0.5s o 30px. Który naturalniejszy?"
+      }
+    ]
+  },
+  {
+    id: "structures",
+    icon: "🧩",
+    title: "Struktury i systemy",
+    color: "#1abc9c",
+    colorDim: "#e0f7f0",
+    desc: "Jak rzeczy się organizują w większe całości.",
+    concepts: [
+      {
+        name: "Struktura",
+        explain: "Sposób, w jaki części są ułożone. Ten sam materiał w różnej strukturze = zupełnie inna rzecz.",
+        analogy: "Te same klocki LEGO ułożone inaczej = dom lub samochód. Struktura to instrukcja budowy.",
+        programming: "Tablica [1,2,3] vs obiekt {imię: \'Jan\', wiek: 12} — te same dane, inna struktura.",
+        question: "Węgiel i diament to ten sam atom! Dlaczego tak różne? (Struktura!)",
+        task: "2 budowle z tych samych 10 kwadratów: wieżę i most. Ta sama ilość — inna funkcja."
+      },
+      {
+        name: "System",
+        explain: "Grupa rzeczy współpracujących razem. Jeden element sam niewiele może.",
+        analogy: "Drużyna: tank, healer, DPS — każdy robi co innego, razem pokonują bossa.",
+        programming: "Aplikacja: frontend + backend + baza danych. Usuń jedno — przestaje działać.",
+        question: "Twoje ciało to system. Jakie podsystemy masz? Co jeśli jeden przestanie działać?",
+        task: "Ekosystem: trawa rośnie, króliki jedzą trawę, lisy jedzą króliki. Obserwuj równowagę!"
+      },
+      {
+        name: "Stan",
+        explain: "Opis tego, jak coś wygląda TERAZ. Jak zdjęcie — zamrożony moment.",
+        analogy: "Save game = zapisany stan. Pozycja, HP, ekwipunek, pora dnia — wszystko w jednym 'zdjęciu'.",
+        programming: "Stan programu = wartości wszystkich zmiennych teraz. useState() w React. Stan zmienia się → ekran się zmienia.",
+        question: "Jaki jest twój 'stan' teraz? Ile zmiennych potrzebujesz, żeby go opisać?",
+        task: "Sygnalizator: CZERWONY → ŻÓŁTY → ZIELONY → CZERWONY. Zmiana co 3s. Maszyna stanów!"
+      },
+      {
+        name: "Konfiguracja",
+        explain: "Konkretny układ elementów systemu. Zmiana konfiguracji = system działa inaczej, te same części.",
+        analogy: "Ustawienia gry: grafika niska/wysoka. Ta sama gra, inna konfiguracja — wygląda inaczej.",
+        programming: "{ tryb: \'łatwy\', dźwięk: true, język: \'PL\' }. Zmiana jednej wartości zmienia zachowanie.",
+        question: "Jak zmieniłbyś konfigurację pokoju, żeby lepiej się uczyć? Nie dodając nic nowego!",
+        task: "Gra z 3 suwakami: prędkość, grawitacja, rozmiar postaci. Zmiana suwaków → gra się zmienia na żywo."
+      },
+      {
+        name: "Organizacja",
+        explain: "Sposób porządkowania elementów, żeby system działał sprawnie. Dobra organizacja = mniej chaosu.",
+        analogy: "Inventory posortowane wg typu vs wszystko w stosie. Łatwiej znaleźć, co potrzebujesz.",
+        programming: "Pliki w folderach vs 100 plików na pulpicie. Organizacja kodu = czytelność.",
+        question: "Jak jest zorganizowana szkoła? Co by się stało bez tej organizacji?",
+        task: "20 losowych słów → posortuj na 4 kategorie (stwórz je sam!). Ćwiczenie organizacji danych."
+      }
+    ]
+  },
+  {
+    id: "relations",
+    icon: "🕸️",
+    title: "Relacje i sieci",
+    color: "#e91e63",
+    colorDim: "#fce4ec",
+    desc: "Jak rzeczy są ze sobą powiązane.",
+    concepts: [
+      {
+        name: "Relacja",
+        explain: "Powiązanie między dwiema rzeczami. 'Jan jest bratem Ani' — to relacja.",
+        analogy: "Lista znajomych w grze online. Jesteś 'przyjacielem' kogoś — to relacja.",
+        programming: "if a > b — relacja. Tabela: uczeń NALEŻY_DO klasy. To relacja między danymi.",
+        question: "Ile typów relacji istnieje? (rodzina, przyjaźń, znajomość, rywalizacja...)",
+        task: "Mapa relacji 5 postaci z gry/filmu. Kto kogo zna? Kto z kim walczył? Kto komu pomógł?"
+      },
+      {
+        name: "Sieć",
+        explain: "Wiele rzeczy połączonych wieloma relacjami. Jak pajęczyna — wszystko powiązane.",
+        analogy: "Internet = sieć komputerów. Instagram = sieć ludzi. Mózg = sieć neuronów.",
+        programming: "Graf: punkty (nodes) + połączenia (edges). Google Maps to graf ulic.",
+        question: "Gdyby 1 serwer się zepsuł — czy cały internet przestałby działać? Dlaczego nie?",
+        task: "6 'komputerów' połączonych liniami. Wyślij 'wiadomość' od jednego do drugiego — musi znaleźć drogę!"
+      },
+      {
+        name: "Połączenie",
+        explain: "Most między elementami pozwalający wymieniać coś (informacje, energię, materiał).",
+        analogy: "USB łączy telefon z ładowarką (energia). WiFi łączy telefon z internetem (dane).",
+        programming: "API to połączenie między programami. Twoja apka łączy się z serwerem pogody.",
+        question: "Jakie połączenia ma twój telefon teraz? (WiFi, Bluetooth, sieć...)",
+        task: "Nadawca wysyła liczbę, Odbiorca wyświetla. Stwórz połączenie. Co jeśli dodasz zakłócenia?"
+      },
+      {
+        name: "Zależność (w sieci)",
+        explain: "Gdy jedna rzecz nie może działać bez drugiej. Aplikacja zależy od internetu.",
+        analogy: "Pochodnia w Minecrafcie ZALEŻY od bloku pod nią. Usuń blok → pochodnia spada.",
+        programming: "Import: twój kod używa biblioteki. Biblioteka zniknie → kod nie ruszy. To zależność!",
+        question: "Od czego zależy to, że siedzisz w tym pokoju? Łańcuch zależności.",
+        task: "4 duszki: A zależy od B, B od C, C od D. Klik D → D znika → C → B → A. Efekt domina!"
+      }
+    ]
+  },
+  {
+    id: "processes",
+    icon: "🔄",
+    title: "Procesy i zmiany",
+    color: "#00bcd4",
+    colorDim: "#e0f7fa",
+    desc: "Jak rzeczy się zmieniają w czasie.",
+    concepts: [
+      {
+        name: "Przepływ",
+        explain: "Coś przemieszcza się z miejsca do miejsca. Woda płynie, prąd płynie, informacja płynie.",
+        analogy: "Linia produkcyjna: surowiec → obróbka → produkt → sklep. Quest flow: NPC → zadanie → walka → nagroda.",
+        programming: "Data flow: input → przetwarzanie → output.",
+        question: "Jak 'przepływa' paczka z internetu do twoich drzwi?",
+        task: "Fabryka: kółko wchodzi z lewej → zmienia kolor → zmienia kształt → wychodzi z prawej."
+      },
+      {
+        name: "Sygnał",
+        explain: "Informacja wysłana z jednego miejsca do drugiego. 'Hej, coś się stało!'",
+        analogy: "Powiadomienie na telefonie = sygnał. Dzwonek w szkole = sygnał. Mówi: REAGUJ!",
+        programming: "Event: kliknięcie myszy to sygnał. Event listener nasłuchuje i reaguje.",
+        question: "Ile sygnałów odebrałeś w ciągu ostatniej godziny?",
+        task: "Spacja → duszek 1 wysyła komunikat → duszek 2 skacze → duszek 3 zmienia kolor. Łańcuch sygnałów!"
+      },
+      {
+        name: "Reakcja",
+        explain: "Odpowiedź na sygnał lub zdarzenie. Coś się stało → coś innego się dzieje w odpowiedzi.",
+        analogy: "Piłka leci w twoją stronę → łapiesz ją. Wróg atakuje → blokujesz.",
+        programming: "onClick → wykonaj funkcję. Cały interaktywny program to pary: sygnał → reakcja.",
+        question: "Jaka jest twoja najszybsza reakcja? A najwolniejsza?",
+        task: "Gra na refleks: losowe kółko pojawia się — kliknij najszybciej! Mierz czas w ms."
+      },
+      {
+        name: "Zmiana w czasie",
+        explain: "Prawie nic nie jest stałe. Rzeczy rosną, maleją, przyspieszają, zwalniają.",
+        analogy: "Timelapse: kwiat kwitnie w 10 sekund. Normalnie trwa to dni. Zmiana jest zawsze.",
+        programming: "Animacja = zmiana w czasie. setInterval(fn, 100) — co 100ms zmień coś.",
+        question: "Co zmienia się szybko (mrugnięcie: 0.3s)? Co wolno (góry: mm/rok)?",
+        task: "Wykres życia rośliny: ziarno → kiełek → roślina → kwiat → owoc. Animuj wzrost."
+      },
+      {
+        name: "Wejście / Wyjście (I/O)",
+        explain: "Wejście to co wpada do systemu. Wyjście to co wychodzi. Każdy system ma oba.",
+        analogy: "Ty: wejście = jedzenie, powietrze, informacje. Wyjście = energia, ruchy, słowa.",
+        programming: "Input: klawiatura, mysz. Output: ekran, głośnik. input() → przetwarzanie → print().",
+        question: "Jakie wejścia i wyjścia ma pralka? A szkoła?",
+        task: "Czarna skrzynka: program przyjmuje liczbę, zwraca wynik. Kolega zgaduje CO robi twój program!"
+      }
+    ]
+  },
+  {
+    id: "equilibrium",
+    icon: "⚖️",
+    title: "Równowaga i stabilność",
+    color: "#00695c",
+    colorDim: "#e0f2f1",
+    desc: "Dlaczego systemy dążą do równowagi — i co się dzieje, gdy ją tracą.",
+    concepts: [
+      {
+        name: "Równowaga",
+        explain: "Stan, w którym nic się nie zmienia, bo wszystkie siły się znoszą. System jest spokojny — nie dlatego, że nic nie działa, ale dlatego, że wszystko się balansuje.",
+        analogy: "Huśtawka z dwoma osobami o tej samej wadze — stoi prosto. W Minecrafcie: piston pcha blok, a drugi pcha z drugiej strony — blok stoi w miejscu.",
+        programming: "Gra: HP bohatera = 100. Co sekundę traci 2 HP (trucizna), ale regeneruje 2 HP (mikstura). HP nie spada i nie rośnie — równowaga!",
+        question: "Temperatura twojego ciała to zawsze ok. 36.6°C. Na dworze jest -10°C albo +35°C — a ty masz ciągle tyle samo. Jak to możliwe?",
+        task: "Stwórz symulację: zmienna 'poziom wody' = 50. Co sekundę losowo dodaje lub odejmuje 1-5. Dodaj mechanizm, który ciągnie wartość z powrotem do 50. Obserwuj wykres!"
+      },
+      {
+        name: "Homeostaza",
+        explain: "Zdolność systemu do utrzymywania stabilnych warunków wewnątrz, mimo zmian na zewnątrz. Ciało to robi non-stop!",
+        analogy: "Termostat w domu: gdy jest zimno — włącza grzanie, gdy gorąco — wyłącza. Sam utrzymuje temperaturę. Twoje ciało działa tak samo — pot gdy gorąco, dreszcze gdy zimno.",
+        programming: "Algorytm termostatu: if (temp < 20) wlaczOgrzewanie(); if (temp > 22) wylaczOgrzewanie(); Nieskończona pętla kontroli!",
+        question: "Dlaczego się pocisz gdy biegasz? Co by było, gdyby ciało nie umiało się chłodzić?",
+        task: "Zaprogramuj 'inteligentny termostat': cel = 21°C. Temperatura losowo się zmienia. Program włącza/wyłącza grzanie. Wyświetlaj wykres temperatury w czasie."
+      },
+      {
+        name: "Sprzężenie zwrotne (feedback)",
+        explain: "Gdy wynik działania wraca i wpływa na to samo działanie. Jak echo — efekt wraca do przyczyny.",
+        analogy: "Mikrofon zbliżony do głośnika: dźwięk → głośnik → mikrofon → głośnik → jeszcze głośniej → PISZCZENIE! To sprzężenie zwrotne dodatnie. Termostat to sprzężenie ujemne — hamuje zmianę.",
+        programming: "Pętla z warunkiem: while (score < 100) { score += bonus; if (score > 80) bonus = bonus * 0.5; } — im bliżej celu, tym wolniej rośnie.",
+        question: "Kula śnieżna tocząc się po śniegu rośnie — im większa, tym więcej śniegu zbiera, tym szybciej rośnie. Jakie to sprzężenie? Gdzie się kończy?",
+        task: "Dwa eksperymenty: 1) populacja królików rośnie o 10% co turę (dodatnie — eksplozja!), 2) populacja rośnie o 10%, ale co turę część ginie z głodu proporcjonalnie do liczebności (ujemne — stabilizacja). Porównaj wykresy!"
+      },
+      {
+        name: "Feedback ujemny (stabilizujący)",
+        explain: "Gdy system SAM SIĘ HAMUJE — zbyt duża zmiana w jedną stronę wywołuje przeciwdziałanie. To jest klucz do stabilności!",
+        analogy: "Jadąc rowerem: przechylasz się w lewo → automatycznie skręcasz kierownicę w lewo → prostujesz się. Nie myślisz o tym — ciało samo koryguje!",
+        programming: "Autopilot: if (samolot_za_wysoko) silnik_mniej(); if (samolot_za_nisko) silnik_wiecej(); Ciągła korekta w obie strony.",
+        question: "W klasie jest za głośno → nauczyciel ucisza → jest cicho → uczniowie znów gadają → znów głośno... Czy to się kiedyś zatrzyma?",
+        task: "Duszek porusza się w stronę kursora myszy, ale im bliżej, tym wolniej (prędkość = odległość / 10). Nigdy nie 'przeskakuje' — gładko zwalnia. To feedback ujemny w akcji!"
+      },
+      {
+        name: "Feedback dodatni (wzmacniający)",
+        explain: "Gdy zmiana WZMACNIA SAMĄ SIEBIE — coraz szybciej, coraz więcej, aż do eksplozji lub załamania. Brak hamulca!",
+        analogy: "Wirusowy filmik na TikToku: 10 osób udostępnia → 100 widzi → 50 udostępnia → 5000 widzi → VIRAL! Każde udostępnienie przyspiesza kolejne.",
+        programming: "followers = followers * 1.1 co dzień. Zaczyna się od 100. Po 30 dniach? Po 100 dniach? Wzrost wykładniczy — zaskakująco szybki!",
+        question: "Panika w tłumie: ktoś krzyczy → inni się boją → więcej krzyczy → więcej paniki. Jak przerwać takie sprzężenie?",
+        task: "Symulacja 'plotka': 1 duszek 'wie'. Co turę każdy 'wiedzący' mówi 2 losowym sąsiadom. Policz: ile tur do momentu gdy wiedzą wszyscy (z 50)?"
+      },
+      {
+        name: "Punkt krytyczny (tipping point)",
+        explain: "Moment, w którym mała zmiana powoduje ogromny efekt. Jak ostatnia kropla, która przelewa szklankę.",
+        analogy: "W Jenga: wyciągasz klocek po klocku — wieża stoi. Aż jeden klocek — BUM! Ten jeden klocek to punkt krytyczny. System nie wraca do normy.",
+        programming: "if (stres > 99) { system_crash(); } — system działa pod obciążeniem, ale jest granica. Jeden request za dużo i serwer pada.",
+        question: "Lód topi się przy 0°C. Przy -1°C jest zamrożony, przy +1°C jest wodą. Mała zmiana (2 stopnie!) — ogromna różnica. Jakie inne 'tipping points' znasz?",
+        task: "Symulacja: stos klocków (liczba 0-100). Co sekundę losowo dodaje się 0-3. Gdy osiągnie 100 → 'zawalenie' (reset do 0 + animacja). Dodaj alarm przy 80!"
+      },
+      {
+        name: "Oscylacja",
+        explain: "Wahanie w tę i z powrotem wokół punktu równowagi. Jak wahadło — nie stoi w miejscu, ale ciągle wraca do środka.",
+        analogy: "Huśtawka: leci w przód, potem w tył, potem znów w przód — waha się wokół środka. Dzień i noc, pory roku, oddychanie — wszystko oscyluje!",
+        programming: "x = 50 + Math.sin(czas) * 30 — pozycja waha się między 20 a 80, zawsze wracając do 50. Sinusoida to królowa oscylacji!",
+        question: "Twój głód oscyluje: rośnie → jesz → spada → znów rośnie. Czy kiedykolwiek jest dokładnie 'zero głodu'? Czy raczej zawsze się waha?",
+        task: "Duszek porusza się sinusoidalnie (x = sin(czas), y = cos(czas)). Zmień częstotliwość suwakiem. Szybko / wolno. Dodaj ślad — rysuje okrąg!"
+      },
+      {
+        name: "Entropia (bałagan)",
+        explain: "Wszystko dąży do bałaganu, jeśli nic nie robisz. Pokój sam się nie posprząta. Lód sam się stopi. Porządek wymaga energii!",
+        analogy: "Pokój: zostawiasz na tydzień → bałagan. Nigdy odwrotnie — bałagan nie zamienia się sam w porządek. W Minecrafcie: creeper wybucha = entropia rośnie!",
+        programming: "Tablica posortowana [1,2,3,4,5]. Losowo zamieniaj elementy — szybko staje się [3,1,5,2,4]. Sortowanie (porządek) wymaga algorytmu (energii). Bałagan jest za darmo.",
+        question: "Dlaczego trzeba CIĄGLE sprzątać pokój? Dlaczego nie wystarczy posprzątać raz na zawsze?",
+        task: "Stwórz 20 duszków ładnie ustawionych w siatce. Przycisk 'entropia' — każdy przesuwa się losowo o 1-10px. Przycisk 'porządkuj' — wracają na miejsce (ale to zajmuje 3 sekundy pętli!)."
+      },
+      {
+        name: "Emergencja",
+        explain: "Gdy proste elementy razem tworzą coś, czego żaden z nich sam nie potrafi. Mrówki są głupie, ale mrowisko jest mądre!",
+        analogy: "Jedna ryba — płynie losowo. 1000 ryb razem — tworzą kształty, uciekają przed drapieżnikiem, wyglądają jak jeden organizm. Nikt nie jest 'szefem' — to emergencja!",
+        programming: "Boids: 3 proste reguły dla każdego obiektu (trzymaj się blisko, nie zderzaj, leć w tym samym kierunku) → cała grupa zachowuje się jak stado!",
+        question: "Korek uliczny: żaden kierowca nie chce stać. Ale razem tworzą korek. Skąd on się bierze, skoro nikt go nie planuje?",
+        task: "10 duszków z 3 regułami: 1) idź w stronę środka grupy, 2) uciekaj od zbyt bliskich, 3) dostosuj kierunek do sąsiadów. Obserwuj — zachowują się jak stado ptaków!"
+      }
+    ]
+  },
+  {
+    id: "thinking",
+    icon: "🧠",
+    title: "Myślenie i modele",
+    color: "#ff9800",
+    colorDim: "#fff3e0",
+    desc: "Jak opisujemy i rozumiemy świat.",
+    concepts: [
+      {
+        name: "Model",
+        explain: "Uproszczony opis czegoś. Mapa to model terenu — nie pokazuje każdego kamyka, ale pokazuje drogi.",
+        analogy: "Mapa w grze to model świata. Nie ma każdego drzewa — ma ważne punkty.",
+        programming: "Klasa to model obiektu. Klasa 'Gracz' opisuje tylko cechy ważne w grze (HP, pozycja).",
+        question: "Globus to model Ziemi. Co pomija? Czy istnieje idealny model?",
+        task: "Model pogody: 3 zmienne (temperatura, wiatr, chmury). Na ich podstawie duszek mówi prognozę."
+      },
+      {
+        name: "Opis",
+        explain: "Powiedzenie, jakie coś jest, za pomocą słów lub liczb. Dokładny opis pozwala odtworzyć coś bez widzenia.",
+        analogy: "Opis postaci RPG: rasa, klasa, statystyki. Mając opis — odtworzysz postać na innym serwerze.",
+        programming: "JSON: { imie: \'Ania\', wiek: 13 }. Strukturalny opis zrozumiały dla komputera.",
+        question: "Opisz jabłko tak dokładnie, żeby ktoś kto go nie widział mógł je rozpoznać.",
+        task: "Jeden opisuje duszka (kolor, rozmiar, pozycja). Drugi tworzy go wg opisu. Porównajcie!"
+      },
+      {
+        name: "Wyjaśnienie",
+        explain: "Powiedzenie DLACZEGO coś się dzieje. Opis = JAK jest, wyjaśnienie = DLACZEGO tak jest.",
+        analogy: "Opis: 'piłka spadła'. Wyjaśnienie: 'bo działa grawitacja'. Wyjaśnienie łączy przyczynę ze skutkiem.",
+        programming: "Komentarze w kodzie: // Dodajemy 10, bo gracz złapał monetę. Mówią DLACZEGO.",
+        question: "Dlaczego niebo jest niebieskie? Spróbuj WYJAŚNIĆ — nie opisać.",
+        task: "5 linii kodu. Do każdej komentarz wyjaśniający DLACZEGO jest potrzebna."
+      },
+      {
+        name: "Obserwacja",
+        explain: "Celowe patrzenie, żeby się czegoś dowiedzieć. Obserwacja to początek nauki.",
+        analogy: "Replay w grze — oglądasz co poszło nie tak. Analizujesz, wyciągasz wnioski.",
+        programming: "console.log() to obserwacja programu. Wyświetlasz wartości, żeby zobaczyć co się dzieje.",
+        question: "Obserwuj 1 minutę za oknem. Co zauważyłeś, czego normalnie byś nie dostrzegł?",
+        task: "Co sekundę zapisuj pozycję myszy (x,y). Po 30s wyświetl ślad ruchu. Obserwacja w danych!"
+      },
+      {
+        name: "Informacja",
+        explain: "Coś, co zmniejsza niepewność. 'Autobus o 15:30' — teraz WIESZ. Wcześniej nie wiedziałeś.",
+        analogy: "Fog of War: niezbadany teren = brak informacji. Zwiadowca odkrywa mapę = zdobywasz informację.",
+        programming: "Dane = surowe fakty (42). Informacja = dane z kontekstem (Ania ma 42 pkt — najlepszy wynik!).",
+        question: "Czy '1234' to informacja? A 'hasło to 1234'? Jaka różnica?",
+        task: "10 pudełek, w jednym skarb. Pytania TAK/NIE. Ile pytań potrzeba, żeby znaleźć?"
+      }
+    ]
+  },
+  {
+    id: "math_thinking",
+    icon: "📊",
+    title: "Myślenie matematyczne",
+    color: "#673ab7",
+    colorDim: "#ede7f6",
+    desc: "Narzędzia myślenia łączące matematykę z programowaniem.",
+    concepts: [
+      {
+        name: "Aksjomat",
+        explain: "Zasada przyjęta na start, bez dowodu. Fundament, na którym budujesz resztę.",
+        analogy: "Reguły gry: 'wieża jeździ prosto' — nie udowadniasz, akceptujesz i grasz.",
+        programming: "Założenia języka: 1+1=2, true != false. Przyjmujesz i budujesz na tym.",
+        question: "Jakie aksjomaty obowiązują w twojej klasie? Kto je ustalił?",
+        task: "Wymyśl grę z 3 aksjomatami. Zagrajcie. Co gdyby zmienić jeden aksjomat?"
+      },
+      {
+        name: "Definicja",
+        explain: "Dokładne wyjaśnienie, co słowo znaczy. Bez definicji ludzie mówią o różnych rzeczach tym samym słowem.",
+        analogy: "'Mob' w Minecrafcie = ruchoma istota. Na ulicy = co innego. Definicja mówi: w NASZEJ rozmowie to znaczy...",
+        programming: "function = definicja zachowania. class = definicja obiektu. Definiujesz co coś JEST i ROBI.",
+        question: "Zdefiniuj 'gra' tak, żeby każdy się zgodził. Trudne? Dlaczego?",
+        task: "Napisz definicje 5 słów programistycznych własnymi słowami. Porównaj z kolegą."
+      },
+      {
+        name: "Zbiór",
+        explain: "Kolekcja rzeczy, które łączy jakaś cecha. 'Liczby parzyste', 'uczniowie tej klasy'.",
+        analogy: "Inventory = zbiór przedmiotów. Friendlist = zbiór znajomych. Playlist = zbiór piosenek.",
+        programming: "Tablica/lista: [\'jabłko\', \'banan\']. Set w Pythonie: unikalny zbiór bez powtórzeń.",
+        question: "Do ilu zbiorów jednocześnie należysz? (uczniowie, Polacy, ludzie, ssaki...)",
+        task: "3 listy: owoce, warzywa, napoje. Losuj 10 produktów — przypisz do zbioru. Sprawdź!"
+      },
+      {
+        name: "Element",
+        explain: "Jedna rzecz w zbiorze. 'Jabłko' to element zbioru 'owoce'. Należy albo nie — nie ma 'trochę'.",
+        analogy: "Jeden item w inventory. Jeden piksel. Jeden gracz w drużynie.",
+        programming: "lista[0] — pierwszy element. lista.includes(\'jabłko\') — czy jest w zbiorze?",
+        question: "Czy 7 jest w zbiorze 'nieparzyste'? A 8?",
+        task: "Bramkarz: wpisz słowo → program sprawdza listę. Jest → wpuszcza, nie ma → blokuje."
+      },
+      {
+        name: "Funkcja",
+        explain: "Maszyna: wejście → proces → wyjście. Wrzucasz jabłko → dostajesz sok.",
+        analogy: "Sokowirówka: WEJŚCIE (owoc) → PROCES (mielenie) → WYJŚCIE (sok). Zawsze tak samo.",
+        programming: "function podwoj(x) { return x*2 } — 5 → 10, 100 → 200. Przewidywalne!",
+        question: "Jakie funkcje wykonujesz codziennie? Co jest wejściem i wyjściem?",
+        task: "3 maszyny-funkcje: podwaja, dodaje 10, neguje. Połącz w łańcuch! Co wejdzie jako 5?"
+      },
+      {
+        name: "Dowód",
+        explain: "Pokazanie, że coś ZAWSZE jest prawdą — nie raz, nie teraz, ale zawsze.",
+        analogy: "'Ten miecz jest najlepszy' — przetestowałeś raz? Z każdym wrogiem i zbroją? To dopiero dowód.",
+        programming: "Testy: sprawdzasz funkcję dla WIELU przypadków. 100% coverage → bliżej dowodu.",
+        question: "'Wszystkie łabędzie są białe.' Ile musisz zobaczyć, żeby udowodnić? A ile czarnych, żeby obalić?",
+        task: "Napisz funkcję. 10 testów. Wszystkie OK? Prawie-dowód że działa!"
+      },
+      {
+        name: "Założenie",
+        explain: "Coś przyjęte na początku, żeby móc dalej myśleć. Może być prawdą lub nie.",
+        analogy: "'Założę, że most wytrzyma.' Idziesz dalej. Jeśli nie — cofasz się.",
+        programming: "'Zakładam, że użytkownik wpisze liczbę.' A co jeśli wpisze tekst? Trzeba obsłużyć!",
+        question: "Jakie założenia robisz rano? Co jeśli jedno zawiedzie?",
+        task: "Kalkulator z założeniem: input = liczba. Dodaj obsługę błędu — co jeśli wpisze 'kot'?"
+      },
+      {
+        name: "Wniosek",
+        explain: "Co wynika z tego, co wiemy. 'Pada' + 'wychodzę' → wniosek: 'zmokę'.",
+        analogy: "Wróg ma 10 HP, twój atak = 15. Wniosek: pokonasz jednym ciosem.",
+        programming: "if (HP <= 0) → wniosek: postać nie żyje. Program wyciąga wnioski z danych.",
+        question: "Temperatura = 35°C, brak chmur — jakie wnioski?",
+        task: "Detektyw: 3 fakty (mokra trawa, zamknięty parasol, suche buty). Program wyciąga wniosek!"
+      },
+      {
+        name: "Warunek",
+        explain: "Okoliczność, która MUSI być spełniona. 'Możesz grać JEŚLI odrobiłeś lekcje.'",
+        analogy: "Drzwi w grze: otwierają się JEŚLI masz klucz. Brak klucza = zamknięte.",
+        programming: "if (wiek >= 18), if (hasło === \'abc\'). Warunki kontrolują przepływ programu.",
+        question: "Jakie warunki musisz spełnić, żeby dostać się do kina?",
+        task: "Zamek szyfrowy: 3 warunki jednocześnie (kolor = niebieski AND liczba > 5 AND hasło = \'drzwi\')."
+      },
+      {
+        name: "Algorytm",
+        explain: "Przepis krok po kroku. Jasna instrukcja — każdy ją wykona i uzyska ten sam wynik.",
+        analogy: "Przepis na naleśniki: krok 1, 2, 3... Każdy dostaje naleśniki.",
+        programming: "Każdy program to algorytm. Sortowanie, wyszukiwanie Google, GPS — algorytmy!",
+        question: "Algorytm 'mycie zębów' — ile kroków? Czy ktoś inny wykona go tak samo?",
+        task: "W parach: algorytm 'kanapka' (10 kroków). Wymiana i DOSŁOWNE wykonanie. Co poszło nie tak?"
+      }
+    ]
+  },
+  {
+    id: "science",
+    icon: "🧭",
+    title: "Jak działa nauka",
+    color: "#795548",
+    colorDim: "#efebe9",
+    desc: "Jak ludzie odkrywają prawdy o świecie.",
+    concepts: [
+      {
+        name: "Teoria",
+        explain: "Najlepsze wyjaśnienie, jakie DZIŚ mamy. Oparte na wielu dowodach. Może się zmienić z nowymi odkryciami.",
+        analogy: "Meta w grze — najlepsza znana strategia. Może się zmienić z nowym patchem, ale teraz to TOP.",
+        programming: "Architektura programu to 'teoria' jak wszystko powinno działać. Może się zmienić.",
+        question: "Czy teoria to zgadywanie? Czym różni się teoria naukowa od spiskowej?",
+        task: "Teoria 'dlaczego w klasie jest ciepło'. Zaproponuj eksperyment sprawdzający."
+      },
+      {
+        name: "Eksperyment",
+        explain: "Celowe testowanie pomysłu. Robisz coś specjalnie, żeby zobaczyć co się stanie.",
+        analogy: "A/B testing: deweloper daje 50% graczy nową broń. Sprawdza czy grają dłużej. Eksperyment!",
+        programming: "'Co się stanie jeśli podam -1?' Uruchamiasz, obserwujesz, uczysz się.",
+        question: "Jak sprawdzisz, czy rośliny rosną szybciej z muzyką? Zaprojektuj eksperyment.",
+        task: "Czy for jest szybszy od while? Zmierz czas 1000 iteracji obu. Zapisz wynik."
+      },
+      {
+        name: "Hipoteza",
+        explain: "Przypuszczenie, które MOŻNA sprawdzić. 'Myślę, że rośliny rosną szybciej z muzyką' — do przetestowania!",
+        analogy: "Przed bossem: 'chyba jest słaby na ogień'. Hipoteza. Testujesz w walce.",
+        programming: "Przed debugowaniem: 'chyba błąd w pętli'. Dodajesz print() → sprawdzasz.",
+        question: "Wymyśl hipotezę o tym pokoju, którą sprawdzisz w 2 minuty.",
+        task: "Hipoteza: 'im szybszy duszek, tym trudniej go kliknąć'. Gra testująca! 3 prędkości, mierz czas."
+      },
+      {
+        name: "Model standardowy",
+        explain: "Wielki zestaw reguł opisujący z czego składa się wszystko. Instrukcja do LEGO dla wszechświata.",
+        analogy: "Rulebook największej gry — wszystkie cząstki, siły, reguły. Działa świetnie, ale nie wyjaśnia wszystkiego.",
+        programming: "Framework: React, Angular — 'model standardowy' budowania aplikacji.",
+        question: "Czy jeden zestaw reguł może opisać WSZYSTKO? Jakie ograniczenia?",
+        task: "Model Standardowy klasy: opiszcie WSZYSTKIE typy cząstek (uczniów, nauczycieli) i siły między nimi."
+      },
+      {
+        name: "Ograniczenia wiedzy",
+        explain: "Nie wszystko wiemy. I to jest OK! Nauka to 'wiemy coraz więcej, ale dużo do odkrycia'.",
+        analogy: "Fog of War: nawet najlepszy gracz nie widzi mapy na starcie. Odkrywasz kawałek po kawałku.",
+        programming: "Bugs: nawet najlepszy program ma błędy. Testy pomagają, ale 100% pewności nie dają.",
+        question: "3 rzeczy, których ludzkość NIE wie. Czy kiedyś się dowiemy?",
+        task: "Lista: wiem / nie wiem / chcę wiedzieć. 3 w każdej kategorii. Dyskusja!"
+      }
+    ]
+  }
+];
+
+const GAMES = [
+  {
+    title: "🎲 Łańcuch pojęć",
+    players: "4-15 osób, 2 drużyny",
+    time: "15 min",
+    rules: "Losujecie kartę z pojęciem. 60 sekund na wyjaśnienie BEZ nazwy i 3 słów zakazanych. Odgadnięte = 1 pkt. Bonus: analogia z programowania = +1 pkt!",
+    materials: "Karty z pojęciami, timer"
+  },
+  {
+    title: "🧩 Buduj system",
+    players: "3-5 osób / grupa",
+    time: "20 min",
+    rules: "10 losowych elementów (router, żarówka, bateria...). Ułóżcie SYSTEM: narysujcie połączenia, opiszcie przepływ, I/O. Prezentacja + głosowanie.",
+    materials: "Kartki z elementami, duże arkusze, markery"
+  },
+  {
+    title: "🔬 Naukowiec vs Programista",
+    players: "Cała klasa, 2 drużyny",
+    time: "15 min",
+    rules: "Zjawisko (np. piłka odbija się). 'Naukowcy' wyjaśniają naukowo (siła, energia). 'Programiści' opisują jak to zakodować (zmienne, warunki). Punkty za użycie pojęć z lekcji!",
+    materials: "Lista zjawisk, tablica"
+  }
+];
+
+const PROJECT = {
+  title: "🚀 Symulacja 'Pole wpływu'",
+  desc: "Interaktywna symulacja — obiekty wpływają na siebie w zależności od odległości.",
+  steps: [
+    "Stwórz 'Źródło' — nieruchomy duszek w centrum",
+    "10 'cząstek' (klonów) poruszających się losowo",
+    "POLE: bliżej niż 150px → przyciąganie",
+    "Suwak 'siła pola' (1-10) — im wyższa, tym mocniej ciągnie",
+    "Drugie Źródło, które ODPYCHA",
+    "Bonus: kolor cząstek zależny od odległości (zielony → żółty → czerwony)"
+  ],
+  concepts: ["obiekt", "pole", "siła", "oddziaływanie", "źródło", "zmienna", "zależność", "I/O", "system"]
+};
+
+
+function App() {
+  const [openSec, setOpenSec] = useState(null);
+  const [openCon, setOpenCon] = useState(null);
+  const [tab, setTab] = useState("sections");
+  const sectionDetailRef = useRef(null);
+  const conceptDetailRef = useRef(null);
+
+  const total = SECTIONS.reduce((s, sec) => s + sec.concepts.length, 0);
+  const curSec = SECTIONS.find(s => s.id === openSec);
+
+  useEffect(() => {
+    if (curSec && sectionDetailRef.current) {
+      sectionDetailRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [openSec]);
+
+  useEffect(() => {
+    if (openCon !== null && conceptDetailRef.current) {
+      conceptDetailRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [openCon]);
+
+  const font = "'Nunito', 'Segoe UI', sans-serif";
+
+  return (
+    <div style={{ minHeight: "100vh", background: "#faf8f5", fontFamily: font, color: "#1a1a2e" }}>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap'); * { margin:0; padding:0; box-sizing:border-box; }`}</style>
+
+      <div style={{ background: "linear-gradient(135deg, #1a1a2e, #16213e, #0f3460)", padding: "32px 20px 24px", color: "#fff" }}>
+        <div style={{ maxWidth: 880, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, opacity: 0.5, letterSpacing: 2, marginBottom: 4 }}>CODING TREE</div>
+          <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 6 }}>Fundamenty myślenia</h1>
+          <p style={{ fontSize: 13, opacity: 0.65 }}>{total} pojęć / {SECTIONS.length} sekcji / {GAMES.length} gry / 1 projekt</p>
+          <div style={{ display: "flex", gap: 6, marginTop: 14, flexWrap: "wrap" }}>
+            {[
+              { k: "sections", l: "Sekcje" },
+              { k: "games", l: "Gry grupowe" },
+              { k: "project", l: "Mini projekt" }
+            ].map(t => (
+              <button key={t.k} onClick={() => { setTab(t.k); setOpenSec(null); setOpenCon(null); }} style={{
+                background: tab === t.k ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.07)",
+                border: "none", borderRadius: 8, padding: "7px 14px",
+                color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: font,
+              }}>{t.l}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ maxWidth: 880, margin: "0 auto", padding: "20px 20px 60px" }}>
+
+        {tab === "sections" && (
+          <>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))", gap: 10, marginBottom: 20 }}>
+              {SECTIONS.map(sec => (
+                <div key={sec.id}
+                  onClick={() => { setOpenSec(openSec === sec.id ? null : sec.id); setOpenCon(null); }}
+                  style={{
+                    background: "#fff",
+                    border: openSec === sec.id ? `2px solid ${sec.color}` : "2px solid #e8e4de",
+                    borderRadius: 14, padding: "14px 16px", cursor: "pointer",
+                    boxShadow: openSec === sec.id ? `0 0 0 3px ${sec.color}22` : "0 1px 4px rgba(0,0,0,0.04)",
+                    transition: "all 0.15s",
+                  }}>
+                  <div style={{ fontSize: 22, marginBottom: 4 }}>{sec.icon}</div>
+                  <div style={{ fontSize: 14, fontWeight: 800, color: openSec === sec.id ? sec.color : "#1a1a2e", marginBottom: 3 }}>{sec.title}</div>
+                  <div style={{ fontSize: 12, color: "#8a8aa0", lineHeight: 1.4 }}>{sec.desc}</div>
+                  <div style={{ fontSize: 11, fontWeight: 600, background: sec.colorDim, color: sec.color, padding: "3px 10px", borderRadius: 20, display: "inline-block", marginTop: 8 }}>
+                    {sec.concepts.length} pojec
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {curSec && (
+              <div ref={sectionDetailRef} style={{ background: curSec.colorDim, borderRadius: 16, padding: 18, border: `1px solid ${curSec.color}30` }}>
+                <h2 style={{ fontSize: 18, fontWeight: 900, marginBottom: 4 }}>{curSec.icon} {curSec.title}</h2>
+                <p style={{ fontSize: 12, color: "#5a5a7a", marginBottom: 14 }}>{curSec.desc}</p>
+
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {curSec.concepts.map((c, idx) => (
+                    <div key={idx}
+                      onClick={() => setOpenCon(openCon === idx ? null : idx)}
+                      style={{
+                        background: "#fff",
+                        border: openCon === idx ? `2px solid ${curSec.color}` : "2px solid transparent",
+                        borderRadius: 12, padding: "12px 14px", cursor: "pointer",
+                        boxShadow: openCon === idx ? `0 0 0 3px ${curSec.color}18` : "none",
+                        transition: "all 0.15s",
+                      }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <span style={{ fontSize: 15, fontWeight: 700 }}>{c.name}</span>
+                        <span style={{ fontSize: 16, transition: "transform 0.2s", transform: openCon === idx ? "rotate(180deg)" : "none" }}>&#9662;</span>
+                      </div>
+                      <div style={{ fontSize: 13, color: "#5a5a7a", marginTop: 4, lineHeight: 1.5 }}>{c.explain}</div>
+
+                      {openCon === idx && (<div ref={conceptDetailRef}>
+                        <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 8 }}>
+                          {[
+                            { bg: "#fff3e0", icon: "\uD83C\uDFAE", label: "Analogia", text: c.analogy },
+                            { bg: "#e3f2fd", icon: "\uD83D\uDCBB", label: "W programowaniu", text: c.programming },
+                            { bg: "#fce4ec", icon: "\u2753", label: "Pytanie do dzieci", text: c.question },
+                            { bg: "#e8f5e9", icon: "\uD83C\uDFAF", label: "Mini zadanie", text: c.task },
+                          ].map((d, i) => (
+                            <div key={i} style={{ background: d.bg, borderRadius: 10, padding: "11px 13px" }}>
+                              <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.2, color: "#666", marginBottom: 4 }}>
+                                {d.icon} {d.label}
+                              </div>
+                              <div style={{ fontSize: 13, lineHeight: 1.7, color: "#1a1a2e" }}>{d.text}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>)}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === "games" && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {GAMES.map((g, i) => (
+              <div key={i} style={{ background: "#fff", borderRadius: 14, padding: "16px 18px", border: "1px solid #e8e4de" }}>
+                <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{g.title}</div>
+                <div style={{ display: "flex", gap: 10, marginBottom: 10, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 12, background: "#e3f2fd", padding: "3px 10px", borderRadius: 8 }}>{g.players}</span>
+                  <span style={{ fontSize: 12, background: "#fff3e0", padding: "3px 10px", borderRadius: 8 }}>{g.time}</span>
+                </div>
+                <div style={{ fontSize: 13, color: "#5a5a7a", lineHeight: 1.7, marginBottom: 8 }}>{g.rules}</div>
+                <div style={{ fontSize: 12, color: "#8a8aa0" }}>{g.materials}</div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {tab === "project" && (
+          <div style={{ background: "#ede7f6", borderRadius: 16, padding: 20, border: "1px solid #6c5ce730" }}>
+            <h2 style={{ fontSize: 18, fontWeight: 900, marginBottom: 4 }}>{PROJECT.title}</h2>
+            <p style={{ fontSize: 13, color: "#5a5a7a", marginBottom: 16, lineHeight: 1.6 }}>{PROJECT.desc}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {PROJECT.steps.map((step, i) => (
+                <div key={i} style={{ background: "rgba(255,255,255,0.8)", borderRadius: 10, padding: "10px 14px", display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ background: "#6c5ce7", color: "#fff", width: 26, height: 26, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0 }}>{i + 1}</span>
+                  <span style={{ fontSize: 14, lineHeight: 1.6 }}>{step}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 16 }}>
+              <div style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: 1.5, color: "#8a8aa0", marginBottom: 6 }}>Wykorzystane pojecia</div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                {PROJECT.concepts.map((c, i) => (
+                  <span key={i} style={{ fontSize: 12, background: "#d1c4e9", color: "#4a148c", padding: "3px 10px", borderRadius: 8 }}>{c}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div style={{ marginTop: 24, background: "#fff", borderRadius: 14, padding: 18, border: "1px solid #e8e4de", textAlign: "center" }}>
+          <div style={{ display: "flex", justifyContent: "center", gap: 24, flexWrap: "wrap" }}>
+            {[
+              { n: total, l: "pojec", e: "\uD83E\uDDE9" },
+              { n: total, l: "analogii", e: "\uD83C\uDFAE" },
+              { n: total, l: "zadan", e: "\uD83C\uDFAF" },
+              { n: GAMES.length, l: "gier", e: "\uD83C\uDFB2" },
+            ].map((s, i) => (
+              <div key={i}>
+                <div style={{ fontSize: 20 }}>{s.e}</div>
+                <div style={{ fontSize: 22, fontWeight: 900 }}>{s.n}</div>
+                <div style={{ fontSize: 10, color: "#8a8aa0" }}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
