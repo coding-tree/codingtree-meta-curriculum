@@ -23,6 +23,9 @@ block-lab). DATA1 należy do ścieżki bocznej `side.tech-world`
 Na razie bez linku: strona `/mapa` platformy nie ma jeszcze
 publicznego adresu.
 
+Test `scripts/step-tags.test.mjs` (bez zależności) sprawdza identyfikatory
+i etykiety: `node --test scripts/*.test.mjs`.
+
 | Moduł | Krok |
 |-------|------|
 | CT1 | `belt.baby-bird.how-a-computer-thinks` |
