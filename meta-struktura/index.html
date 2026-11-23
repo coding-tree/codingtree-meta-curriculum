@@ -85,6 +85,7 @@ const MODULES = [
   {
     id: "CT1",
     level: "explorer",
+    step: "belt.baby-bird.how-a-computer-thinks",
     title: "Myślenie komputacyjne",
     subtitle: "Fundament",
     duration: "~12 tygodni",
@@ -100,6 +101,7 @@ const MODULES = [
   {
     id: "S1",
     level: "explorer",
+    step: "belt.white.first-programs",
     title: "Scratch — Podstawy",
     subtitle: "Pierwsze programy",
     duration: "~14 tygodni",
@@ -115,6 +117,7 @@ const MODULES = [
   {
     id: "S2",
     level: "explorer",
+    step: "belt.orange.games-with-logic",
     title: "Scratch — Zaawansowany",
     subtitle: "Złożone projekty",
     duration: "~14 tygodni",
@@ -132,6 +135,7 @@ const MODULES = [
   {
     id: "PY1",
     level: "builder",
+    step: "belt.blue.first-real-language",
     title: "Python — Fundamenty",
     subtitle: "Przejście na tekst",
     duration: "~16 tygodni",
@@ -147,6 +151,7 @@ const MODULES = [
   {
     id: "WEB1",
     level: "builder",
+    step: "belt.green.the-web",
     title: "Web — HTML & CSS",
     subtitle: "Twoja pierwsza strona",
     duration: "~12 tygodni",
@@ -164,6 +169,7 @@ const MODULES = [
   {
     id: "PY2",
     level: "creator",
+    step: "belt.yellow-green.scripts-and-history",
     title: "Python — Średniozaawansowany",
     subtitle: "Prawdziwe projekty",
     duration: "~16 tygodni",
@@ -179,6 +185,7 @@ const MODULES = [
   {
     id: "WEB2",
     level: "creator",
+    step: "belt.green.the-web",
     title: "Web — JavaScript",
     subtitle: "Interaktywność",
     duration: "~16 tygodni",
@@ -196,6 +203,7 @@ const MODULES = [
   {
     id: "PY3",
     level: "developer",
+    step: "belt.brown.servers-and-apps",
     title: "Python — Zaawansowany",
     subtitle: "Specjalizacja",
     duration: "~16 tygodni",
@@ -211,6 +219,7 @@ const MODULES = [
   {
     id: "WEB3",
     level: "developer",
+    step: "belt.brown.servers-and-apps",
     title: "Web — Frontend Framework",
     subtitle: "Nowoczesne aplikacje",
     duration: "~16 tygodni",
@@ -226,6 +235,7 @@ const MODULES = [
   {
     id: "DATA1",
     level: "developer",
+    step: "side.tech-world",
     title: "Dane i AI — Wprowadzenie",
     subtitle: "Ścieżka dodatkowa",
     duration: "~12 tygodni",
@@ -247,7 +257,35 @@ const LEVEL_COLORS = {
   developer: { main: "var(--violet)", dim: "var(--violet-dim)", bright: "var(--violet)" },
 };
 
+/* Kroki Curriculum Map (step id → etykieta). Nazwy pasów jak w block-lab (curriculum-step-ids.json). */
+const STEP_LABELS = {
+  "belt.baby-bird.how-a-computer-thinks": "Krok: Baby Bird",
+  "belt.white.first-programs": "Krok: Biały pas",
+  "belt.orange.games-with-logic": "Krok: Pomarańczowy pas",
+  "belt.blue.first-real-language": "Krok: Niebieski pas",
+  "belt.yellow-green.scripts-and-history": "Krok: Żółto-zielony pas",
+  "belt.green.the-web": "Krok: Zielony pas",
+  "belt.brown.servers-and-apps": "Krok: Brązowy pas",
+  "side.tech-world": "Ścieżka: Świat technologii dziś",
+};
+
 /* ─── COMPONENTS ─── */
+
+const StepTag = ({ mod }) => (
+  <span
+    data-module={mod.id}
+    data-step={mod.step}
+    title={mod.step}
+    style={{
+      display: "inline-block", maxWidth: "100%",
+      fontSize: 11, color: "var(--text-muted)",
+      border: "1px solid var(--border)", background: "var(--bg)",
+      padding: "2px 8px", borderRadius: 6, overflowWrap: "break-word",
+    }}
+  >
+    {STEP_LABELS[mod.step]}
+  </span>
+);
 
 const ModuleCard = ({ mod, isSelected, onClick, isUnlocked }) => {
   const colors = LEVEL_COLORS[mod.level];
@@ -285,7 +323,8 @@ const ModuleCard = ({ mod, isSelected, onClick, isUnlocked }) => {
         <span style={{ fontSize: 11, color: "var(--text-dim)" }}>{mod.duration}</span>
       </div>
       <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 4 }}>{mod.title}</div>
-      <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 10 }}>{mod.subtitle}</div>
+      <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 8 }}>{mod.subtitle}</div>
+      <div style={{ marginBottom: 10 }}><StepTag mod={mod} /></div>
       <div style={{ fontSize: 12, color: "var(--text-dim)", lineHeight: 1.5 }}>
         {mod.summary.slice(0, 80)}{mod.summary.length > 80 ? "…" : ""}
       </div>
@@ -607,7 +646,7 @@ function CodingTreeMap() {
                     border: `1px solid ${selected === mod.id ? colors.main : "var(--border)"}`,
                     borderRadius: 12, padding: "14px 18px",
                     cursor: "pointer", transition: "all 0.2s",
-                    display: "flex", alignItems: "center", gap: 16,
+                    display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap",
                   }}
                 >
                   <span style={{
@@ -617,9 +656,10 @@ function CodingTreeMap() {
                   }}>
                     {mod.id}
                   </span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ flex: "1 1 180px", minWidth: 0 }}>
                     <div style={{ fontSize: 15, fontWeight: 600 }}>{mod.title}</div>
                     <div style={{ fontSize: 12, color: "var(--text-dim)" }}>{mod.subtitle}</div>
+                    <div style={{ marginTop: 6 }}><StepTag mod={mod} /></div>
                   </div>
                   <div style={{ display: "flex", gap: 8, flexShrink: 0, alignItems: "center" }}>
                     <span style={{
